@@ -308,6 +308,7 @@
             this.hScrollBar1.Size = new System.Drawing.Size(80, 17);
             this.hScrollBar1.TabIndex = 3;
             this.hScrollBar1.ValueChanged += new System.EventHandler(this.scrollBar1_ValueChanged);
+            this.hScrollBar1.MouseCaptureChanged += new System.EventHandler(this.scrollBar1_MouseCaptureChanged);
             // 
             // vScrollBar1
             // 
@@ -316,6 +317,7 @@
             this.vScrollBar1.Size = new System.Drawing.Size(17, 80);
             this.vScrollBar1.TabIndex = 4;
             this.vScrollBar1.ValueChanged += new System.EventHandler(this.scrollBar1_ValueChanged);
+            this.vScrollBar1.MouseCaptureChanged += new System.EventHandler(this.scrollBar1_MouseCaptureChanged);
             // 
             // Form1
             // 

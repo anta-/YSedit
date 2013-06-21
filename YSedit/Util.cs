@@ -33,7 +33,7 @@ namespace YSedit
         /// floatを16進数でフォーマットする
         /// </summary>
         /// <param name="x">フォーマットする値</param>
-        public static string floatToHexString(float x)
+        public static string floatToHexString(this float x)
         {
             const int expBits = 8, fracBits = 23, bias = 127;
             
@@ -101,7 +101,7 @@ namespace YSedit
             return t;
         }
 
-        public static float floatFromHexString(string s)
+        public static float floatFromHexString(this string s)
         {
             const int expBits = 8, fracBits = 23;
 

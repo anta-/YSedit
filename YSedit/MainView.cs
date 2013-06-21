@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Drawing;
+using System.Windows.Forms;
 
 namespace YSedit
 {
@@ -12,6 +13,7 @@ namespace YSedit
     /// </summary>
     class MainView
     {
+        PictureBox pictureBox;
         ROMInterface romIF;
 
         public delegate void ChangeSizeProc(MainView sender);
@@ -38,9 +40,14 @@ namespace YSedit
             }
         };
         List<ObjPlace> objPlaceList = new List<ObjPlace>();
+        List<PictureBox> objPictureBoxes = new List<PictureBox>();
 
-        public MainView(ROMInterface romIF)
+        readonly Size objectDrawBox = new Size(17, 17);
+        Point currentScroll = new Point();
+
+        public MainView(PictureBox pictureBox, ROMInterface romIF)
         {
+            this.pictureBox = pictureBox;
             this.romIF = romIF;
         }
 
@@ -55,21 +62,23 @@ namespace YSedit
             
             var g = Graphics.FromImage(bmp);
             var font = new Font("MS Gothic", 8);
-            var brush = new SolidBrush(Color.FromArgb(0x80, Color.Red));
+            var rectBrush = new SolidBrush(Color.FromArgb(0xff, Color.White));
+            var rectPen = new Pen(Color.FromArgb(0xff, Color.SkyBlue));
             var strBrush = new SolidBrush(Color.FromArgb(0xff, Color.Black));
-            var strBackBrush = new SolidBrush(Color.FromArgb(0xff, Color.White));
             foreach(var o in objPlaceList)
             {
-                var p = new Point((int)o.x - rect.X, (int)o.y - rect.Y);
-                var text = o.kind.ToString("x4");
-                var textP = new PointF(p.X, p.Y);
-                g.FillRectangle(strBackBrush, new RectangleF(textP, g.MeasureString(text, font)));
-                g.DrawString(text, font, strBrush, textP);
-                g.FillRectangle(brush, new Rectangle(new Point(p.X - 1, p.Y - 1), new Size(3, 3)));
+                var oRect = new Rectangle(new Point((int)o.x - rect.X, (int)o.y - rect.Y),
+                    new Size(objectDrawBox.Width - 1, objectDrawBox.Height - 1));
+                g.FillRectangle(rectBrush, oRect);
+                g.DrawRectangle(rectPen, oRect);
+                string s = ((o.kind & 0xf000) != 0x4000) ? "xxx" : (o.kind & 0xfff).ToString("x3");
+                g.DrawString(s, font, strBrush, new PointF(oRect.X + -1, oRect.Y + 3));
             }
 
             return bmp;
         }
+
+
 
         /// <summary>
         /// objPlacesを強制的に設定する
@@ -79,16 +88,47 @@ namespace YSedit
         {
             int number = (int)(objPlaces.bytes.Length / romIF.objPlaceC_size);
             objPlaceList = new List<ObjPlace>(number);
+            objPictureBoxes = new List<PictureBox>(number);
 
+            pictureBox.Controls.Clear();
+            pictureBox.SuspendLayout();
             for (var i = 0; i < number; i++)
             {
                 uint o = (uint)(i * romIF.objPlaceC_size);
-                objPlaceList.Add(new ObjPlace(
+                var p = new ObjPlace(
                     objPlaces.getHalf(o + romIF.objPlace_kind),
                     objPlaces.getHalf(o + romIF.objPlace_info),
                     objPlaces.getFloat(o + romIF.objPlace_xpos),
-                    objPlaces.getFloat(o + romIF.objPlace_ypos)));
+                    objPlaces.getFloat(o + romIF.objPlace_ypos));
+                objPlaceList.Add(p);
+                var b = new PictureBox();
+                b.Location = new Point((int)p.x - currentScroll.X, (int)p.y - currentScroll.Y);
+                b.Size = objectDrawBox;
+                b.BackColor = Color.Transparent;
+                b.MouseHover += tooltipPopup;
+                objPictureBoxes.Add(b);
+                pictureBox.Controls.Add(b);
             }
+            scrollEnd(currentScroll.X, currentScroll.Y);
+        }
+
+        void tooltipPopup(object sender, EventArgs e)
+        {
+            var t = new ToolTip();
+            var p = (PictureBox)sender;
+            var i = objPictureBoxes.IndexOf(p);
+            var o = objPlaceList[i];
+            var namee = ObjectName.getObjectName(o.kind, ObjectName.Language.English);
+            var namej = ObjectName.getObjectName(o.kind, ObjectName.Language.Japanese);
+            t.SetToolTip(p,
+                "#" + i.ToString("x2") + "\n" +
+                "Kind: " + o.kind.ToString("x4") + "\n" +
+                (namee == null ? "" :
+                "Name: " + namee + "\n" +
+                "(ja): " + namej + "\n") +
+                "Info: " + o.info.ToString("x4") + "\n" +
+                "XPos: 0x" + o.x.floatToHexString() + " / " + o.x.ToString() + "\n" +
+                "YPos: 0x" + o.y.floatToHexString() + " / " + o.y.ToString());
         }
 
         /// <summary>
@@ -110,6 +150,40 @@ namespace YSedit
             }
 
             return objPlaces;
+        }
+
+        Rectangle getObjectBox(ObjPlace o)
+        {
+            return new Rectangle(new Point((int)o.x, (int)o.y), objectDrawBox);
+        }
+
+        /// <summary>
+        /// スクロールし始めた時に呼ぶ
+        /// </summary>
+        public void scrollStart()
+        {
+            for (var i = 0; i < objPlaceList.Count; i++)
+            {
+                objPictureBoxes[i].Visible = false;
+            }
+        }
+
+        /// <summary>
+        /// スクロールし終わった時に呼ぶ
+        /// </summary>
+        public void scrollEnd(int x, int y)
+        {
+            currentScroll = new Point(x, y);
+
+            pictureBox.SuspendLayout();
+            for (var i = 0; i < objPlaceList.Count; i++)
+            {
+                var o = objPlaceList[i];
+                objPictureBoxes[i].Location =
+                    new Point((int)o.x - x, (int)o.y - y);
+                objPictureBoxes[i].Visible = true;
+            }
+            pictureBox.ResumeLayout(false);
         }
     }
 }

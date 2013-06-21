@@ -34,8 +34,7 @@ namespace YSedit
 
         private void closeROMToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            closeRomFile();
-            setROMOpend(false);
+            setROMOpend(closeRomFile());
         }
 
         void setROMOpend(bool b)
@@ -109,13 +108,22 @@ namespace YSedit
         /// <summary>
         /// 今開いているROMを閉じる
         /// </summary>
-        public void closeRomFile()
+        /// <returns>実際に閉じたならfalse, 閉じなかったならtrue</returns>
+        public bool closeRomFile()
         {
-            rom.Dispose();
-            rom = null;
-            mainView = null;
-            renderingMainView();
-            setInfoStatusText("ROM closed");
+            try
+            {
+                rom.Dispose();
+                rom = null;
+                mainView = null;
+                renderingMainView();
+                setInfoStatusText("ROM closed");
+                return false;
+            }
+            catch (ROM.UserCancel)
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -138,7 +146,7 @@ namespace YSedit
                 rom = new ROM(path);
                 rom.changedChanged = romChangedChanged;
 
-                rom.mainView = mainView = new MainView(rom.romIF);
+                rom.mainView = mainView = new MainView(pictureBox1, rom.romIF);
                 mainView.changeSize = mainView_setSize;
 
                 rom.openPracticeMap();
@@ -219,12 +227,10 @@ namespace YSedit
 
         void setScrollBarSize()
         {
-            setInfoStatusText(Size.ToString() + ", " + ClientSize.ToString());
-
             Size mainViewSize = mainView != null ? mainView.size : new Size(1, 1);
 
-            var pictureBox1Width = ClientSize.Width - vScrollBar1.Width;
-            var pictureBox1Height = ClientSize.Height - statusStrip1.Height - hScrollBar1.Height - menuStrip1.Height;
+            var pictureBox1Width = Math.Max(1, ClientSize.Width - vScrollBar1.Width);
+            var pictureBox1Height = Math.Max(1, ClientSize.Height - statusStrip1.Height - hScrollBar1.Height - menuStrip1.Height);
 
             vScrollBar1.Maximum = Math.Max(0, mainViewSize.Height - 1 - pictureBox1Height);
             vScrollBar1.Visible = vScrollBar1.Maximum > 0;
@@ -283,6 +289,18 @@ namespace YSedit
         private void scrollBar1_ValueChanged(object sender, EventArgs e)
         {
             renderingMainView();
+        }
+
+        private void scrollBar1_MouseCaptureChanged(object sender, EventArgs e)
+        {
+            if (mainView != null)
+            {
+                var scrollBar = (ScrollBar)sender;
+                if (scrollBar.Capture)
+                    mainView.scrollStart();
+                else
+                    mainView.scrollEnd(hScrollBar1.Value, vScrollBar1.Value);
+            }
         }
     }
 }
