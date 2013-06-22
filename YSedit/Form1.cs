@@ -143,7 +143,7 @@ namespace YSedit
             try
             {
                 rom = new ROM(path);
-                rom.changedChanged = romChangedChanged;
+                rom.changedChanged += romChangedChanged;
 
                 rom.mainView = mainView = new MainView(mainViewPanel, rom.romIF);
 

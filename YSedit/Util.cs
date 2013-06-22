@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace YSedit
 {
@@ -166,47 +167,95 @@ namespace YSedit
             }
             return res;
         }
-    }
-}
 
-static class WindowsUtil
-{
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
-    public static IntPtr SendMessage(this Control control, UInt32 Msg, IntPtr wParam, IntPtr lParam)
-    {
-        return SendMessage(control.Handle, Msg, wParam, lParam);
-    }
-    public static IntPtr SendMessage(this Control control, UInt32 Msg, uint wParam, uint lParam)
-    {
-        return SendMessage(control.Handle, Msg, new IntPtr(wParam), new IntPtr(lParam));
     }
 
-    private const int WM_SETREDRAW = 11;
-
-    public static void SuspendDrawing(this Control c)
+    //Vector(System.Windowsネームスペース)にしてやるのめんどくさい
+    static class PointVectorExts
     {
-        c.SendMessage(WM_SETREDRAW, 0, 0);
+        public static Point Add(this Point p, Point q)
+        {
+            return new Point(p.X + q.X, p.Y + q.Y);
+        }
+        public static Point Sub(this Point p, Point q)
+        {
+            return new Point(p.X - q.X, p.Y - q.Y);
+        }
+        public static Size Mult(this Size x, int y)
+        {
+            return new Size(x.Width * y, x.Height * y);
+        }
+
+        public static Rectangle Expand(this Rectangle x, Size y)
+        {
+            return new Rectangle(x.Location - y, x.Size + y.Mult(2));
+        }
+
+        public static Point Fit(this Point p, Rectangle r)
+        {
+            if (p.X < r.X) p.X = r.X;
+            if (p.Y < r.Y) p.Y = r.Y;
+            if (r.Right <= p.X) p.X = r.Right;
+            if (r.Bottom <= p.Y) p.Y = r.Bottom;
+            return p;
+        }
+
+        public static Rectangle TwoPoints(this Point p, Point q)
+        {
+            return new Rectangle(p, (Size)q.Sub(p));
+        }
+
+        public static Point Min2(this Point p, Point q)
+        {
+            return new Point(Math.Min(p.X, q.X), Math.Min(p.Y, q.Y));
+        }
+
+        public static Point Max2(this Point p, Point q)
+        {
+            return new Point(Math.Max(p.X, q.X), Math.Max(p.Y, q.Y));
+        }
     }
 
-    public static void ResumeDrawing(this Control c, bool refresh = true)
+    static class WindowsUtil
     {
-        c.SendMessage(WM_SETREDRAW, 1, 0);
-        if (refresh)
-            c.Refresh();
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
+        public static IntPtr SendMessage(this Control control, UInt32 Msg, IntPtr wParam, IntPtr lParam)
+        {
+            return SendMessage(control.Handle, Msg, wParam, lParam);
+        }
+        public static IntPtr SendMessage(this Control control, UInt32 Msg, uint wParam, uint lParam)
+        {
+            return SendMessage(control.Handle, Msg, new IntPtr(wParam), new IntPtr(lParam));
+        }
+
+        private const int WM_SETREDRAW = 11;
+
+        public static void SuspendDrawing(this Control c)
+        {
+            c.SendMessage(WM_SETREDRAW, 0, 0);
+        }
+
+        public static void ResumeDrawing(this Control c, bool refresh = true)
+        {
+            c.SendMessage(WM_SETREDRAW, 1, 0);
+            if (refresh)
+                c.Refresh();
+        }
+
+        [DllImport("User32.dll", SetLastError = true)]
+        public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+        [DllImport("User32.dll", SetLastError = true)]
+        public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+        public static int SetWindowLong(this Control control, int nIndex, int dwNewLong)
+        {
+            return SetWindowLong(control.Handle, nIndex, dwNewLong);
+        }
+        public static int GetWindowLong(this Control control, int nIndex)
+        {
+            return GetWindowLong(control.Handle, nIndex);
+        }
     }
 
-    [DllImport("User32.dll", SetLastError = true)]
-    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-    [DllImport("User32.dll", SetLastError = true)]
-    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-
-    public static int SetWindowLong(this Control control, int nIndex, int dwNewLong)
-    {
-        return SetWindowLong(control.Handle, nIndex, dwNewLong);
-    }
-    public static int GetWindowLong(this Control control, int nIndex)
-    {
-        return GetWindowLong(control.Handle, nIndex);
-    }
 }

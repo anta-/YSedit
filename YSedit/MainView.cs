@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Input = System.Windows.Input;
 
 namespace YSedit
 {
@@ -15,6 +16,12 @@ namespace YSedit
     /// </summary>
     class MainView : IDisposable
     {
+        public delegate void OnChangedProc();
+        /// <summary>
+        /// 変化しえたこと(実際のデータは変化しているとは限らない)を通知する
+        /// </summary>
+        public event OnChangedProc onChanged;
+
         ROMInterface romIF;
 
         Panel panel;
@@ -80,9 +87,15 @@ namespace YSedit
         List<ObjPlace> objPlaceList = new List<ObjPlace>();
         List<ObjectBox> objBoxes = new List<ObjectBox>();
 
+        Size currentScroll = new Size();
+
         readonly Size objectDrawBox = new Size(17, 17);
-        Point currentScroll = new Point();
         readonly Size objectMoveEdge = new Size(17, 17);
+        /// <summary>
+        /// マウスでオブジェクトをドラッグしながら画面端に行くとスクロールするようにするが、
+        /// その範囲(正なら外側、負なら内側)
+        /// </summary>
+        readonly Size mouseDragScrollEdge = new Size(-1, -1);
 
         HashSet<int> selectObjs = new HashSet<int>();
         bool objDrag = false;
@@ -131,8 +144,7 @@ namespace YSedit
         /// </summary>
         /// <param name="bmp">描画するビットマップ</param>
         /// <param name="rect">描画する範囲</param>
-        /// <returns>描画されたBitmap</returns>
-        Bitmap render(Bitmap bmp, Rectangle rect)
+        void render(Bitmap bmp, Rectangle rect)
         {
             var g = Graphics.FromImage(bmp);
             var font = new Font("MS Gothic", 8);
@@ -147,15 +159,13 @@ namespace YSedit
             {
                 var o = objPlaceList[i];
                 var selected = selectObjs.Contains(i);
-                var oRect = new Rectangle(new Point((int)o.x - rect.X, (int)o.y - rect.Y),
+                var oRect = new Rectangle(new Point((int)o.x, (int)o.y).Sub(rect.Location),
                     new Size(objectDrawBox.Width - 1, objectDrawBox.Height - 1));
                 g.FillRectangle(selected ? selectedRectBrush : rectBrush, oRect);
                 g.DrawRectangle(selected ? selectedRectPen : rectPen, oRect);
                 string s = ((o.kind & 0xf000) != 0x4000) ? "xxx" : (o.kind & 0xfff).ToString("x3");
                 g.DrawString(s, font, selected ? selectedStrBrush : strBrush, new PointF(oRect.X + -1, oRect.Y + 3));
             }
-
-            return bmp;
         }
 
 
@@ -182,7 +192,7 @@ namespace YSedit
                     objPlaces.getFloat(o + romIF.objPlace_ypos));
                 objPlaceList.Add(p);
                 var b = new ObjectBox(this);
-                b.Location = new Point((int)p.x - currentScroll.X, (int)p.y - currentScroll.Y);
+                b.Location = new Point((int)p.x, (int)p.y) - currentScroll;
                 b.Size = objectDrawBox;
                 
                 b.MouseHover += tooltipPopup;
@@ -260,14 +270,13 @@ namespace YSedit
         /// </summary>
         void movingEnd()
         {
-            currentScroll = new Point(hScrollBar.Value, vScrollBar.Value);
-
+            currentScroll = new Size(hScrollBar.Value, vScrollBar.Value);
             pictureBox.SuspendDrawing();
             for (var i = 0; i < objPlaceList.Count; i++)
             {
                 var o = objPlaceList[i];
                 objBoxes[i].Location =
-                    new Point((int)o.x - currentScroll.X, (int)o.y - currentScroll.Y);
+                    new Point((int)o.x, (int)o.y) - currentScroll;
             }
             pictureBox.ResumeDrawing();
         }
@@ -279,6 +288,10 @@ namespace YSedit
             if (selectObjs.Contains(i))
             {
             }
+            else if (getKey(Input.Key.LeftCtrl) || getKey(Input.Key.RightCtrl))
+            {
+                selectObjs.Add(i);
+            }
             else
             {
                 selectObjs.Clear();
@@ -287,7 +300,7 @@ namespace YSedit
             p.Capture = true;
             objDrag = true;
             dragFore = false;
-            dragStartPoint = pictureBox.PointToClient(p.PointToScreen(e.Location));
+            dragStartPoint = pictureBox.PointToClient(p.PointToScreen(e.Location)) + currentScroll;
 
             foreach (var j in selectObjs)
             {
@@ -296,13 +309,13 @@ namespace YSedit
             }
         }
 
-        void moveObject(int i, float x, float y, bool pictureBoxMove)
+        void moveObject(int i, float x, float y)
         {
+            if ((objPlaceList[i].x != x ||
+                objPlaceList[i].y != y) &&
+                onChanged != null) onChanged();
             objPlaceList[i].x = x;
             objPlaceList[i].y = y;
-            if (pictureBoxMove)
-                objBoxes[i].Location =
-                    new Point((int)x - currentScroll.X, (int)y - currentScroll.Y);
         }
 
         void mouseClick(object sender, MouseEventArgs e)
@@ -311,35 +324,61 @@ namespace YSedit
             redraw();
         }
 
-        bool moveSelectObjs(ObjectBox p, MouseEventArgs e, bool pictureBoxMove)
+        bool getKey(Input.Key key)
         {
-            var pos = pictureBox.PointToClient(p.PointToScreen(e.Location));
-            int dx = pos.X - dragStartPoint.Value.X, dy = pos.Y - dragStartPoint.Value.Y;
+            return Input.Keyboard.GetKeyStates(key).HasFlag(Input.KeyStates.Down);
+        }
+
+        int fitMoving(int x)
+        {
+            if (getKey(Input.Key.LeftShift) || getKey(Input.Key.RightShift))
+            {   //1ずつ動かすモード
+                return x;
+            }
+            else
+            {   //8ずつ動かすモード
+                return (x + 4) / 8 * 8;
+            }
+        }
+
+        bool moveSelectObjs(ObjectBox p, Point pos)
+        {
+            Program.form.setInfoStatusText(currentScroll.ToString());
+            pos += currentScroll;
+            int dx = fitMoving(pos.X - dragStartPoint.Value.X),
+                dy = fitMoving(pos.Y - dragStartPoint.Value.Y);
 
             foreach (var i in selectObjs)
             {
-                int x = dragStartObjPoses[i].Value.X + dx,
-                    y = dragStartObjPoses[i].Value.Y + dy;
-                x = Math.Max(x, objectMoveEdge.Width - objectDrawBox.Width);
-                y = Math.Max(y, objectMoveEdge.Height - objectDrawBox.Height);
-                x = Math.Min(x, size.Width - objectMoveEdge.Width);
-                y = Math.Min(y, size.Height - objectMoveEdge.Height);
-                moveObject(i, x, y, pictureBoxMove);
+                Point t =
+                    dragStartObjPoses[i].Value + new Size(dx, dy);
+                t = t.Fit(
+                    ((Point)objectMoveEdge - objectDrawBox).TwoPoints(
+                        (Point)size - objectMoveEdge));
+                moveObject(i, t.X, t.Y);
             }
 
             return dx != 0 || dy != 0;
+        }
+
+        Point getMouseClientPos(ObjectBox sender, MouseEventArgs e)
+        {
+            return pictureBox.PointToClient(
+                sender.PointToScreen(e.Location));
         }
 
         void objMouseUp(object sender, MouseEventArgs e)
         {
             if (!objDrag) return;
             var p = (ObjectBox)sender;
-            moveSelectObjs(p, e, true);
+            moveSelectObjs(p, getMouseClientPos(p, e));
 
             dragFore = false;
             objDrag = false;
             dragStartPoint = null;
             p.Capture = false;
+            
+            movingEnd();
             redraw();
 
             foreach (var j in selectObjs)
@@ -354,7 +393,21 @@ namespace YSedit
             if (!objDrag) return;
             var p = (ObjectBox)sender;
 
-            bool moving = moveSelectObjs(p, e, false);
+            var pos = getMouseClientPos(p, e);
+
+            var notScrollRect = pictureBox.ClientRectangle.Expand(mouseDragScrollEdge);
+            var scroll =
+                pos.Sub(notScrollRect.Location).Min2(Point.Empty).Add(
+                pos.Sub(notScrollRect.Location + notScrollRect.Size - new Size(1, 1)).Max2(Point.Empty));
+            if (scroll.X != 0 || scroll.Y != 0)
+            {
+                scrollBarValueChangedRedraw = false;
+                hScrollBar.Value = Math.Max(0, Math.Min(hScrollBar.Value + Math.Sign(scroll.X) * 16, hScrollBar.Maximum - hScrollBar.LargeChange + 1));
+                vScrollBar.Value = Math.Max(0, Math.Min(vScrollBar.Value + Math.Sign(scroll.Y) * 16, vScrollBar.Maximum - vScrollBar.LargeChange + 1));
+                scrollBarValueChangedRedraw = true;
+            }
+
+            bool moving = moveSelectObjs(p, pos);
 
             if (!dragFore && moving)
             {
@@ -365,6 +418,7 @@ namespace YSedit
                 changeObjectID(perm);
                 dragFore = true;
             }
+
             redraw();
         }
 
@@ -380,7 +434,7 @@ namespace YSedit
                 foreach (var j in selectObjs)
                 {
                     dragStartObjPoses[j] = null;
-                    moveObject(j, objPlaceList[j].x, objPlaceList[j].y, true);
+                    moveObject(j, objPlaceList[j].x, objPlaceList[j].y);
                     objBoxes[j].Visible = true;
                 }
             }
@@ -429,21 +483,21 @@ namespace YSedit
             g.DrawImageUnscaled(mainBmp, 0, 0);
         }
 
-        bool setScrollBarSize()
+        void setScrollBarSize()
         {
             var pictureBoxWidth = Math.Min(Math.Max(1, panel.ClientSize.Width - vScrollBar.Width), size.Width);
             var pictureBoxHeight = Math.Min(Math.Max(1, panel.ClientSize.Height - hScrollBar.Height), size.Height);
 
             var vScrollBarSliderSize = pictureBoxHeight / 2;
             vScrollBar.LargeChange = vScrollBarSliderSize;
-            vScrollBar.Maximum = Math.Max(0, size.Height - vScrollBarSliderSize - 2);
+            vScrollBar.Maximum = Math.Max(0, size.Height - vScrollBarSliderSize - 1);
             vScrollBar.Visible = vScrollBar.Maximum - vScrollBarSliderSize > 0;
             vScrollBar.Left = pictureBoxWidth;
             var vScrollBarHeight = panel.Height - hScrollBar.Height;
 
             var hScrollBarSliderSize = pictureBoxWidth / 2;
             hScrollBar.LargeChange = hScrollBarSliderSize;
-            hScrollBar.Maximum = Math.Max(0, size.Width - hScrollBarSliderSize - 2);
+            hScrollBar.Maximum = Math.Max(0, size.Width - hScrollBarSliderSize - 1);
             hScrollBar.Visible = hScrollBar.Maximum - hScrollBarSliderSize > 0;
             hScrollBar.Top = pictureBoxHeight;
             var hScrollBarWidth = panel.Width - vScrollBar.Width;
@@ -452,30 +506,40 @@ namespace YSedit
             {
                 pictureBoxWidth += vScrollBar.Width;
                 hScrollBarWidth += vScrollBar.Width;
+                hScrollBarSliderSize = pictureBoxWidth / 2;
+                hScrollBar.LargeChange = hScrollBarSliderSize;
+                hScrollBar.Maximum = Math.Max(0, size.Width - hScrollBarSliderSize - 1);
             }
 
             if (!hScrollBar.Visible)
             {
                 pictureBoxHeight += hScrollBar.Height;
                 vScrollBarHeight += hScrollBar.Height;
+                vScrollBarSliderSize = pictureBoxHeight / 2;
+                vScrollBar.LargeChange = vScrollBarSliderSize;
+                vScrollBar.Maximum = Math.Max(0, size.Height - vScrollBarSliderSize - 1);
             }
 
             pictureBox.Size = new Size(pictureBoxWidth, pictureBoxHeight);
             hScrollBar.Width = hScrollBarWidth;
             vScrollBar.Height = vScrollBarHeight;
 
-            if (vScrollBar.Maximum - vScrollBarSliderSize + 2 < vScrollBar.Value ||
-                hScrollBar.Maximum - hScrollBarSliderSize + 2 < hScrollBar.Value)
+            if (vScrollBar.Maximum - vScrollBarSliderSize + 1 < vScrollBar.Value ||
+                hScrollBar.Maximum - hScrollBarSliderSize + 1 < hScrollBar.Value)
             {
-                vScrollBar.Value = Math.Max(0, Math.Min(vScrollBar.Value, vScrollBar.Maximum - vScrollBarSliderSize + 2));
-                hScrollBar.Value = Math.Max(0, Math.Min(hScrollBar.Value, hScrollBar.Maximum - hScrollBarSliderSize + 2));
-                return true;
+                scrollBarValueChangedRedraw = false;
+                vScrollBar.Value = Math.Max(0, Math.Min(vScrollBar.Value, vScrollBar.Maximum - vScrollBarSliderSize + 1));
+                hScrollBar.Value = Math.Max(0, Math.Min(hScrollBar.Value, hScrollBar.Maximum - hScrollBarSliderSize + 1));
+                scrollBarValueChangedRedraw = true;
             }
-            else return false;
         }
 
+        int redrawCount = 0;
         void redraw()
         {
+            Program.form.setInfoStatusText(redrawCount.ToString());
+            redrawCount++;
+
             if (pictureBox.Width <= 0 ||
                 pictureBox.Height <= 0)
             {
@@ -499,8 +563,8 @@ namespace YSedit
 
         private void panel_Resize(object sender, EventArgs e)
         {
-            if (!setScrollBarSize())
-                redraw();
+            setScrollBarSize();
+            redraw();
             movingEnd();
         }
 
@@ -511,9 +575,12 @@ namespace YSedit
                 movingEnd();
         }
 
+        bool scrollBarValueChangedRedraw = true;
         private void scrollBar_ValueChanged(object sender, EventArgs e)
         {
-            redraw();
+            currentScroll = new Size(hScrollBar.Value, vScrollBar.Value);
+            if (scrollBarValueChangedRedraw)
+                redraw();
         }
     }
 }

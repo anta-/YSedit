@@ -30,7 +30,7 @@ namespace YSedit
         /// <summary>
         /// 保存されていない変更の状態の変化を通知する
         /// </summary>
-        public ChangedChanged changedChanged = null;
+        public event ChangedChanged changedChanged = null;
 
         /// <summary>
         /// pathのファイルを開く
