@@ -13,21 +13,23 @@ namespace YSedit
     /// メインビューの操作と描画をする。
     /// ObjPlacesなどのDataをやり取りする。
     /// </summary>
-    class MainView
+    class MainView : IDisposable
     {
-        PictureBox pictureBox;
         ROMInterface romIF;
 
-        public delegate void ChangeSizeProc(MainView sender);
-        public ChangeSizeProc changeSize;
-        public delegate void RedrawProc(MainView sender);
-        public RedrawProc redraw;
+        Panel panel;
+        PictureBox pictureBox;
+        VScrollBar vScrollBar;
+        HScrollBar hScrollBar;
+        Bitmap mainBmp = new Bitmap(1, 1);
+
         Size size_;
         public Size size {
             get { return size_; }
             set {
                 size_ = value;
-                if(changeSize != null) changeSize(this);
+                setScrollBarSize();
+                redraw();
             }
         }
 
@@ -88,10 +90,40 @@ namespace YSedit
         Point? dragStartPoint;
         List<Point?> dragStartObjPoses;
 
-        public MainView(PictureBox pictureBox, ROMInterface romIF)
+        public MainView(Panel panel, ROMInterface romIF)
         {
-            this.pictureBox = pictureBox;
             this.romIF = romIF;
+            this.panel = panel;
+
+            pictureBox = new PictureBox();
+            //子供の場所の描画をするために
+            pictureBox.SetWindowLong(-16, pictureBox.GetWindowLong(-16) & ~0x02000000);
+            pictureBox.Paint += pictureBox_Paint;
+            
+            vScrollBar = new VScrollBar();
+            hScrollBar = new HScrollBar();
+            vScrollBar.Top = 0;
+            hScrollBar.Left = 0;
+            vScrollBar.MouseCaptureChanged += scrollBar_MouseCaptureChanged;
+            hScrollBar.MouseCaptureChanged += scrollBar_MouseCaptureChanged;
+            vScrollBar.ValueChanged += scrollBar_ValueChanged;
+            hScrollBar.ValueChanged += scrollBar_ValueChanged;
+
+            hScrollBar.ResumeDrawing();
+            vScrollBar.ResumeDrawing();
+
+            panel.Controls.Add(pictureBox);
+            panel.Controls.Add(vScrollBar);
+            panel.Controls.Add(hScrollBar);
+            panel.Resize += panel_Resize;
+
+            panel_Resize(panel, new EventArgs());
+        }
+
+        public void Dispose()
+        {
+            panel.Controls.Clear();
+            panel.Resize -= panel_Resize;
         }
 
         /// <summary>
@@ -100,7 +132,7 @@ namespace YSedit
         /// <param name="bmp">描画するビットマップ</param>
         /// <param name="rect">描画する範囲</param>
         /// <returns>描画されたBitmap</returns>
-        public Bitmap rendering(Bitmap bmp, Rectangle rect)
+        Bitmap render(Bitmap bmp, Rectangle rect)
         {
             var g = Graphics.FromImage(bmp);
             var font = new Font("MS Gothic", 8);
@@ -167,7 +199,8 @@ namespace YSedit
             selectObjs.Clear();
             dragStartObjPoses = Enumerable.Repeat<Point?>(null, number).ToList();
 
-            movingEnd(currentScroll.X, currentScroll.Y);
+            movingEnd();
+            redraw();
         }
 
         void setObjectChildIndex(int i)
@@ -223,20 +256,18 @@ namespace YSedit
         }
 
         /// <summary>
-        /// スクロール・リサイズをし終わった時に呼ぶ
+        /// スクロール・リサイズをし終わった時
         /// </summary>
-        /// <param name="x">スクロールx</param>
-        /// <param name="y">スクロールy</param>
-        public void movingEnd(int x, int y)
+        void movingEnd()
         {
-            currentScroll = new Point(x, y);
+            currentScroll = new Point(hScrollBar.Value, vScrollBar.Value);
 
             pictureBox.SuspendDrawing();
             for (var i = 0; i < objPlaceList.Count; i++)
             {
                 var o = objPlaceList[i];
                 objBoxes[i].Location =
-                    new Point((int)o.x - x, (int)o.y - y);
+                    new Point((int)o.x - currentScroll.X, (int)o.y - currentScroll.Y);
             }
             pictureBox.ResumeDrawing();
         }
@@ -277,7 +308,7 @@ namespace YSedit
         void mouseClick(object sender, MouseEventArgs e)
         {
             selectObjs.Clear();
-            redraw(this);
+            redraw();
         }
 
         bool moveSelectObjs(ObjectBox p, MouseEventArgs e, bool pictureBoxMove)
@@ -309,7 +340,7 @@ namespace YSedit
             objDrag = false;
             dragStartPoint = null;
             p.Capture = false;
-            redraw(this);
+            redraw();
 
             foreach (var j in selectObjs)
             {
@@ -334,7 +365,7 @@ namespace YSedit
                 changeObjectID(perm);
                 dragFore = true;
             }
-            redraw(this);
+            redraw();
         }
 
         void objMouseCaptureChanged(object sender, EventArgs e)
@@ -344,7 +375,7 @@ namespace YSedit
             {
                 objDrag = false;
                 dragStartPoint = null;
-                redraw(this);
+                redraw();
 
                 foreach (var j in selectObjs)
                 {
@@ -389,6 +420,100 @@ namespace YSedit
                 if (perm[i] != i)
                     setObjectChildIndex(i);
             }
+        }
+
+        private void pictureBox_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.Clear(pictureBox.BackColor);
+            g.DrawImageUnscaled(mainBmp, 0, 0);
+        }
+
+        bool setScrollBarSize()
+        {
+            var pictureBoxWidth = Math.Min(Math.Max(1, panel.ClientSize.Width - vScrollBar.Width), size.Width);
+            var pictureBoxHeight = Math.Min(Math.Max(1, panel.ClientSize.Height - hScrollBar.Height), size.Height);
+
+            var vScrollBarSliderSize = pictureBoxHeight / 2;
+            vScrollBar.LargeChange = vScrollBarSliderSize;
+            vScrollBar.Maximum = Math.Max(0, size.Height - vScrollBarSliderSize - 2);
+            vScrollBar.Visible = vScrollBar.Maximum - vScrollBarSliderSize > 0;
+            vScrollBar.Left = pictureBoxWidth;
+            var vScrollBarHeight = panel.Height - hScrollBar.Height;
+
+            var hScrollBarSliderSize = pictureBoxWidth / 2;
+            hScrollBar.LargeChange = hScrollBarSliderSize;
+            hScrollBar.Maximum = Math.Max(0, size.Width - hScrollBarSliderSize - 2);
+            hScrollBar.Visible = hScrollBar.Maximum - hScrollBarSliderSize > 0;
+            hScrollBar.Top = pictureBoxHeight;
+            var hScrollBarWidth = panel.Width - vScrollBar.Width;
+
+            if (!vScrollBar.Visible)
+            {
+                pictureBoxWidth += vScrollBar.Width;
+                hScrollBarWidth += vScrollBar.Width;
+            }
+
+            if (!hScrollBar.Visible)
+            {
+                pictureBoxHeight += hScrollBar.Height;
+                vScrollBarHeight += hScrollBar.Height;
+            }
+
+            pictureBox.Size = new Size(pictureBoxWidth, pictureBoxHeight);
+            hScrollBar.Width = hScrollBarWidth;
+            vScrollBar.Height = vScrollBarHeight;
+
+            if (vScrollBar.Maximum - vScrollBarSliderSize + 2 < vScrollBar.Value ||
+                hScrollBar.Maximum - hScrollBarSliderSize + 2 < hScrollBar.Value)
+            {
+                vScrollBar.Value = Math.Max(0, Math.Min(vScrollBar.Value, vScrollBar.Maximum - vScrollBarSliderSize + 2));
+                hScrollBar.Value = Math.Max(0, Math.Min(hScrollBar.Value, hScrollBar.Maximum - hScrollBarSliderSize + 2));
+                return true;
+            }
+            else return false;
+        }
+
+        void redraw()
+        {
+            if (pictureBox.Width <= 0 ||
+                pictureBox.Height <= 0)
+            {
+                mainBmp = new Bitmap(1, 1);
+            }
+            else
+            {
+                if (mainBmp.Size != pictureBox.Size)
+                    mainBmp = new Bitmap(pictureBox.Width, pictureBox.Height);
+                else
+                    Graphics.FromImage(mainBmp).Clear(Color.Transparent);
+
+                render(mainBmp, new Rectangle(
+                    new Point(hScrollBar.Value, vScrollBar.Value),
+                    pictureBox.Size));
+            }
+            pictureBox.Invalidate();
+        }
+
+
+
+        private void panel_Resize(object sender, EventArgs e)
+        {
+            if (!setScrollBarSize())
+                redraw();
+            movingEnd();
+        }
+
+        private void scrollBar_MouseCaptureChanged(object sender, EventArgs e)
+        {
+            var scrollBar = (ScrollBar)sender;
+            if (!scrollBar.Capture)
+                movingEnd();
+        }
+
+        private void scrollBar_ValueChanged(object sender, EventArgs e)
+        {
+            redraw();
         }
     }
 }

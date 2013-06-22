@@ -56,12 +56,9 @@
             this.openROMFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.infoStatusText = new System.Windows.Forms.ToolStripStatusLabel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.hScrollBar1 = new System.Windows.Forms.HScrollBar();
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
+            this.mainViewPanel = new System.Windows.Forms.Panel();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -291,53 +288,29 @@
             this.infoStatusText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.infoStatusText.ToolTipText = "Ready";
             // 
-            // pictureBox1
+            // mainViewPanel
             // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.Control;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 24);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(275, 203);
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
-            // 
-            // hScrollBar1
-            // 
-            this.hScrollBar1.Location = new System.Drawing.Point(0, 230);
-            this.hScrollBar1.Name = "hScrollBar1";
-            this.hScrollBar1.Size = new System.Drawing.Size(275, 17);
-            this.hScrollBar1.TabIndex = 3;
-            this.hScrollBar1.ValueChanged += new System.EventHandler(this.scrollBar1_ValueChanged);
-            this.hScrollBar1.MouseCaptureChanged += new System.EventHandler(this.scrollBar1_MouseCaptureChanged);
-            // 
-            // vScrollBar1
-            // 
-            this.vScrollBar1.Location = new System.Drawing.Point(278, 24);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(17, 203);
-            this.vScrollBar1.TabIndex = 4;
-            this.vScrollBar1.ValueChanged += new System.EventHandler(this.scrollBar1_ValueChanged);
-            this.vScrollBar1.MouseCaptureChanged += new System.EventHandler(this.scrollBar1_MouseCaptureChanged);
+            this.mainViewPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.mainViewPanel.Location = new System.Drawing.Point(0, 24);
+            this.mainViewPanel.Name = "mainViewPanel";
+            this.mainViewPanel.Size = new System.Drawing.Size(384, 286);
+            this.mainViewPanel.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 332);
+            this.Controls.Add(this.mainViewPanel);
             this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.statusStrip1);
-            this.Controls.Add(this.vScrollBar1);
-            this.Controls.Add(this.hScrollBar1);
-            this.Controls.Add(this.pictureBox1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "YSedit";
-            this.Resize += new System.EventHandler(this.Form1_Resize);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -373,9 +346,7 @@
         public System.Windows.Forms.ToolStripStatusLabel infoStatusText;
         private System.Windows.Forms.ToolStripMenuItem mapInformationToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.HScrollBar hScrollBar1;
-        private System.Windows.Forms.VScrollBar vScrollBar1;
+        private System.Windows.Forms.Panel mainViewPanel;
     }
 }
 

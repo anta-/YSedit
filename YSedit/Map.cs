@@ -51,8 +51,8 @@ namespace YSedit
             var objPlaces = rom.readData(iObjPlaces,
                 placeVector.getHalf(romIF.placeVector_numberOfObjPlaces) * romIF.objPlaceC_size);
 
-            mainView.size = new System.Drawing.Size(0x2000, 0x200); //TODO: データから読み込む
             mainView.setObjPlaces(objPlaces);   //objPlacesはmainViewが持つ
+            mainView.size = new System.Drawing.Size(0x2000, 0x200); //TODO: データから読み込む
         }
 
         public void Dispose()

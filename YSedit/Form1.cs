@@ -15,19 +15,11 @@ namespace YSedit
 
         ROM rom = null;
         MainView mainView = null;
-        Bitmap mainViewBmp = new Bitmap(1, 1);
 
         public Form1()
         {
             InitializeComponent();
 
-            hScrollBar1.ResumeDrawing();
-            vScrollBar1.ResumeDrawing();
-
-            //子供の場所の描画を
-            pictureBox1.SetWindowLong(-16, pictureBox1.GetWindowLong(-16) & ~0x02000000);
-            
-            Form1_Resize(this, new EventArgs());
             setInfoStatusText("");
             setROMOpend(false);
         }
@@ -121,8 +113,8 @@ namespace YSedit
             {
                 rom.Dispose();
                 rom = null;
+                mainView.Dispose();
                 mainView = null;
-                renderingMainView();
                 setInfoStatusText("ROM closed");
                 return false;
             }
@@ -152,9 +144,7 @@ namespace YSedit
                 rom = new ROM(path);
                 rom.changedChanged = romChangedChanged;
 
-                rom.mainView = mainView = new MainView(pictureBox1, rom.romIF);
-                mainView.changeSize = mainView_setSize;
-                mainView.redraw = mainView_redraw;
+                rom.mainView = mainView = new MainView(mainViewPanel, rom.romIF);
 
                 rom.openPracticeMap();
                 setInfoStatusText("ROM \"" + path + "\", practice map opened");
@@ -179,9 +169,10 @@ namespace YSedit
                     if (rom != null)
                         rom.Dispose();
                     rom = null;
+                    if (mainView != null)
+                        mainView.Dispose();
                     mainView = null;
                 }
-                renderingMainView();
             }
             return proceeded;
         }
@@ -217,118 +208,6 @@ namespace YSedit
         private void mapInformationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(rom.map.getMapInformationStr(), "Map information");
-        }
-
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            var g = e.Graphics;
-            g.Clear(pictureBox1.BackColor);
-            g.DrawImageUnscaled(mainViewBmp, 0, 0);
-        }
-
-        bool setScrollBarSize()
-        {
-            Size mainViewSize = mainView != null ? mainView.size : new Size(1, 1);
-
-            var pictureBox1Width = Math.Min(Math.Max(1, ClientSize.Width - vScrollBar1.Width), mainViewSize.Width);
-            var pictureBox1Height = Math.Min(Math.Max(1, ClientSize.Height - statusStrip1.Height - hScrollBar1.Height - menuStrip1.Height), mainViewSize.Height);
-
-            var vScrollBar1SliderSize = pictureBox1Height / 2;
-            vScrollBar1.LargeChange = vScrollBar1SliderSize;
-            vScrollBar1.Maximum = Math.Max(0, mainViewSize.Height - vScrollBar1SliderSize - 2);
-            vScrollBar1.Visible = vScrollBar1.Maximum - vScrollBar1SliderSize > 0;
-            vScrollBar1.Left = pictureBox1Width;
-            var vScrollBar1Height = statusStrip1.Top - menuStrip1.Height - hScrollBar1.Height;
-
-            var hScrollBar1SliderSize = pictureBox1Width / 2;
-            hScrollBar1.LargeChange = hScrollBar1SliderSize;
-            hScrollBar1.Maximum = Math.Max(0, mainViewSize.Width - hScrollBar1SliderSize - 2);
-            hScrollBar1.Visible = hScrollBar1.Maximum - hScrollBar1SliderSize > 0;
-            hScrollBar1.Top = menuStrip1.Height + pictureBox1Height;
-            var hScrollBar1Width = ClientSize.Width - vScrollBar1.Width;
-
-            if (!vScrollBar1.Visible)
-            {
-                pictureBox1Width += vScrollBar1.Width;
-                hScrollBar1Width += vScrollBar1.Width;
-            }
-
-            if (!hScrollBar1.Visible)
-            {
-                pictureBox1Height += hScrollBar1.Height;
-                vScrollBar1Height += hScrollBar1.Height;
-            }
-
-            vScrollBar1.Enabled = hScrollBar1.Enabled = mainView != null;
-
-            pictureBox1.Size = new Size(pictureBox1Width, pictureBox1Height);
-            hScrollBar1.Width = hScrollBar1Width;
-            vScrollBar1.Height = vScrollBar1Height;
-
-            if (mainView != null &&
-                vScrollBar1.Maximum - vScrollBar1SliderSize + 2 < vScrollBar1.Value ||
-                hScrollBar1.Maximum - hScrollBar1SliderSize + 2 < hScrollBar1.Value)
-            {
-                vScrollBar1.Value = Math.Max(0, Math.Min(vScrollBar1.Value, vScrollBar1.Maximum - vScrollBar1SliderSize + 2));
-                hScrollBar1.Value = Math.Max(0, Math.Min(hScrollBar1.Value, hScrollBar1.Maximum - hScrollBar1SliderSize + 2));
-                return true;
-            }
-            else return false;
-        }
-
-        void mainView_setSize(MainView sender)
-        {
-            setScrollBarSize();
-        }
-
-        void renderingMainView()
-        {
-            if (mainView == null ||
-                pictureBox1.Width <= 0 ||
-                pictureBox1.Height <= 0)
-            {
-                mainViewBmp = new Bitmap(1, 1);
-            }
-            else
-            {
-                if (mainViewBmp.Size != pictureBox1.Size)
-                    mainViewBmp = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                else
-                    Graphics.FromImage(mainViewBmp).Clear(Color.Transparent);
-
-                mainView.rendering(mainViewBmp, new Rectangle(
-                    new Point(hScrollBar1.Value, vScrollBar1.Value),
-                    pictureBox1.Size));
-            }
-            pictureBox1.Invalidate();
-        }
-
-        private void scrollBar1_ValueChanged(object sender, EventArgs e)
-        {
-            renderingMainView();
-        }
-
-        private void scrollBar1_MouseCaptureChanged(object sender, EventArgs e)
-        {
-            if (mainView != null)
-            {
-                var scrollBar = (ScrollBar)sender;
-                if (!scrollBar.Capture)
-                    mainView.movingEnd(hScrollBar1.Value, vScrollBar1.Value);
-            }
-        }
-
-        void mainView_redraw(MainView sender)
-        {
-            renderingMainView();
-        }
-
-        private void Form1_Resize(object sender, EventArgs e)
-        {
-            if (!setScrollBarSize())
-                renderingMainView();
-            if (mainView != null)
-                mainView.movingEnd(hScrollBar1.Value, vScrollBar1.Value);
         }
     }
 }
