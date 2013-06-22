@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace YSedit
 {
@@ -18,6 +20,8 @@ namespace YSedit
 
         public delegate void ChangeSizeProc(MainView sender);
         public ChangeSizeProc changeSize;
+        public delegate void RedrawProc(MainView sender);
+        public RedrawProc redraw;
         Size size_;
         public Size size {
             get { return size_; }
@@ -39,11 +43,50 @@ namespace YSedit
                 this.y = y;
             }
         };
+        class ObjectBox : PictureBox
+        {
+            MainView mainView;
+            public ObjectBox(MainView mainView)
+                : base()
+            {
+                this.mainView = mainView;
+            }
+
+            [DllImport("user32.dll")]
+            static extern IntPtr BeginPaint(IntPtr hwnd, IntPtr lpPaint);
+            [DllImport("user32.dll")]
+            static extern bool EndPaint(IntPtr hWnd, IntPtr lpPaint);
+
+            protected override void WndProc(ref Message m)
+            {
+                if (m.Msg == 0x14)  //WM_ERASEBKGND
+                {
+                    m.Result = new IntPtr(1);   //TRUEを返すと背景が塗りつぶされない
+                    return;
+                }
+                if (m.Msg == 0xf)
+                {
+                    BeginPaint(m.HWnd, m.LParam);
+                    EndPaint(m.HWnd, m.LParam);
+                    m.Result = new IntPtr(0);
+                    return;
+                }
+                base.WndProc(ref m);
+            }
+        }
+
         List<ObjPlace> objPlaceList = new List<ObjPlace>();
-        List<PictureBox> objPictureBoxes = new List<PictureBox>();
+        List<ObjectBox> objBoxes = new List<ObjectBox>();
 
         readonly Size objectDrawBox = new Size(17, 17);
         Point currentScroll = new Point();
+        readonly Size objectMoveEdge = new Size(17, 17);
+
+        HashSet<int> selectObjs = new HashSet<int>();
+        bool objDrag = false;
+        bool dragFore = false;
+        Point? dragStartPoint;
+        List<Point?> dragStartObjPoses;
 
         public MainView(PictureBox pictureBox, ROMInterface romIF)
         {
@@ -54,25 +97,30 @@ namespace YSedit
         /// <summary>
         /// rectで指定された範囲を描画して返す
         /// </summary>
+        /// <param name="bmp">描画するビットマップ</param>
         /// <param name="rect">描画する範囲</param>
         /// <returns>描画されたBitmap</returns>
-        public Bitmap rendering(Rectangle rect)
+        public Bitmap rendering(Bitmap bmp, Rectangle rect)
         {
-            var bmp = new Bitmap(rect.Width, rect.Height);
-            
             var g = Graphics.FromImage(bmp);
             var font = new Font("MS Gothic", 8);
             var rectBrush = new SolidBrush(Color.FromArgb(0xff, Color.White));
             var rectPen = new Pen(Color.FromArgb(0xff, Color.SkyBlue));
             var strBrush = new SolidBrush(Color.FromArgb(0xff, Color.Black));
-            foreach(var o in objPlaceList)
+            var selectedRectBrush = new SolidBrush(Color.FromArgb(0xff, Color.Black));
+            var selectedRectPen = new Pen(Color.FromArgb(0xff, Color.SkyBlue));
+            var selectedStrBrush = new SolidBrush(Color.FromArgb(0xff, Color.White));
+
+            for (var i = 0; i < objPlaceList.Count; i++ )
             {
+                var o = objPlaceList[i];
+                var selected = selectObjs.Contains(i);
                 var oRect = new Rectangle(new Point((int)o.x - rect.X, (int)o.y - rect.Y),
                     new Size(objectDrawBox.Width - 1, objectDrawBox.Height - 1));
-                g.FillRectangle(rectBrush, oRect);
-                g.DrawRectangle(rectPen, oRect);
+                g.FillRectangle(selected ? selectedRectBrush : rectBrush, oRect);
+                g.DrawRectangle(selected ? selectedRectPen : rectPen, oRect);
                 string s = ((o.kind & 0xf000) != 0x4000) ? "xxx" : (o.kind & 0xfff).ToString("x3");
-                g.DrawString(s, font, strBrush, new PointF(oRect.X + -1, oRect.Y + 3));
+                g.DrawString(s, font, selected ? selectedStrBrush : strBrush, new PointF(oRect.X + -1, oRect.Y + 3));
             }
 
             return bmp;
@@ -81,17 +129,17 @@ namespace YSedit
 
 
         /// <summary>
-        /// objPlacesを強制的に設定する
+        /// objPlacesを設定する
         /// </summary>
         /// <param name="objPlaces">ObjPlace_C[]のData</param>
         public void setObjPlaces(Data objPlaces)
         {
             int number = (int)(objPlaces.bytes.Length / romIF.objPlaceC_size);
             objPlaceList = new List<ObjPlace>(number);
-            objPictureBoxes = new List<PictureBox>(number);
+            objBoxes = new List<ObjectBox>(number);
 
+            pictureBox.SuspendDrawing();
             pictureBox.Controls.Clear();
-            pictureBox.SuspendLayout();
             for (var i = 0; i < number; i++)
             {
                 uint o = (uint)(i * romIF.objPlaceC_size);
@@ -101,22 +149,39 @@ namespace YSedit
                     objPlaces.getFloat(o + romIF.objPlace_xpos),
                     objPlaces.getFloat(o + romIF.objPlace_ypos));
                 objPlaceList.Add(p);
-                var b = new PictureBox();
+                var b = new ObjectBox(this);
                 b.Location = new Point((int)p.x - currentScroll.X, (int)p.y - currentScroll.Y);
                 b.Size = objectDrawBox;
-                b.BackColor = Color.Transparent;
+                
                 b.MouseHover += tooltipPopup;
-                objPictureBoxes.Add(b);
+                b.MouseDown += objMouseDown;
+                b.MouseUp += objMouseUp;
+                b.MouseMove += objMouseMove;
+                b.MouseCaptureChanged += objMouseCaptureChanged;
+                objBoxes.Add(b);
                 pictureBox.Controls.Add(b);
+                setObjectChildIndex(i);
             }
-            scrollEnd(currentScroll.X, currentScroll.Y);
+            pictureBox.MouseClick += mouseClick;
+
+            selectObjs.Clear();
+            dragStartObjPoses = Enumerable.Repeat<Point?>(null, number).ToList();
+
+            movingEnd(currentScroll.X, currentScroll.Y);
+        }
+
+        void setObjectChildIndex(int i)
+        {
+            //値が小さい方が前面に出る
+            pictureBox.Controls.SetChildIndex(
+                objBoxes[i], objBoxes.Count - i);
         }
 
         void tooltipPopup(object sender, EventArgs e)
         {
             var t = new ToolTip();
-            var p = (PictureBox)sender;
-            var i = objPictureBoxes.IndexOf(p);
+            var p = (ObjectBox)sender;
+            var i = objBoxes.IndexOf(p);
             var o = objPlaceList[i];
             var namee = ObjectName.getObjectName(o.kind, ObjectName.Language.English);
             var namej = ObjectName.getObjectName(o.kind, ObjectName.Language.Japanese);
@@ -158,32 +223,172 @@ namespace YSedit
         }
 
         /// <summary>
-        /// スクロールし始めた時に呼ぶ
+        /// スクロール・リサイズをし終わった時に呼ぶ
         /// </summary>
-        public void scrollStart()
-        {
-            for (var i = 0; i < objPlaceList.Count; i++)
-            {
-                objPictureBoxes[i].Visible = false;
-            }
-        }
-
-        /// <summary>
-        /// スクロールし終わった時に呼ぶ
-        /// </summary>
-        public void scrollEnd(int x, int y)
+        /// <param name="x">スクロールx</param>
+        /// <param name="y">スクロールy</param>
+        public void movingEnd(int x, int y)
         {
             currentScroll = new Point(x, y);
 
-            pictureBox.SuspendLayout();
+            pictureBox.SuspendDrawing();
             for (var i = 0; i < objPlaceList.Count; i++)
             {
                 var o = objPlaceList[i];
-                objPictureBoxes[i].Location =
+                objBoxes[i].Location =
                     new Point((int)o.x - x, (int)o.y - y);
-                objPictureBoxes[i].Visible = true;
             }
-            pictureBox.ResumeLayout(false);
+            pictureBox.ResumeDrawing();
+        }
+
+        void objMouseDown(object sender, MouseEventArgs e)
+        {
+            var p = (ObjectBox)sender;
+            var i = objBoxes.IndexOf(p);
+            if (selectObjs.Contains(i))
+            {
+            }
+            else
+            {
+                selectObjs.Clear();
+                selectObjs.Add(i);
+            }
+            p.Capture = true;
+            objDrag = true;
+            dragFore = false;
+            dragStartPoint = pictureBox.PointToClient(p.PointToScreen(e.Location));
+
+            foreach (var j in selectObjs)
+            {
+                dragStartObjPoses[j] = new Point((int)objPlaceList[j].x, (int)objPlaceList[j].y);
+                objBoxes[j].Visible = false;
+            }
+        }
+
+        void moveObject(int i, float x, float y, bool pictureBoxMove)
+        {
+            objPlaceList[i].x = x;
+            objPlaceList[i].y = y;
+            if (pictureBoxMove)
+                objBoxes[i].Location =
+                    new Point((int)x - currentScroll.X, (int)y - currentScroll.Y);
+        }
+
+        void mouseClick(object sender, MouseEventArgs e)
+        {
+            selectObjs.Clear();
+            redraw(this);
+        }
+
+        bool moveSelectObjs(ObjectBox p, MouseEventArgs e, bool pictureBoxMove)
+        {
+            var pos = pictureBox.PointToClient(p.PointToScreen(e.Location));
+            int dx = pos.X - dragStartPoint.Value.X, dy = pos.Y - dragStartPoint.Value.Y;
+
+            foreach (var i in selectObjs)
+            {
+                int x = dragStartObjPoses[i].Value.X + dx,
+                    y = dragStartObjPoses[i].Value.Y + dy;
+                x = Math.Max(x, objectMoveEdge.Width - objectDrawBox.Width);
+                y = Math.Max(y, objectMoveEdge.Height - objectDrawBox.Height);
+                x = Math.Min(x, size.Width - objectMoveEdge.Width);
+                y = Math.Min(y, size.Height - objectMoveEdge.Height);
+                moveObject(i, x, y, pictureBoxMove);
+            }
+
+            return dx != 0 || dy != 0;
+        }
+
+        void objMouseUp(object sender, MouseEventArgs e)
+        {
+            if (!objDrag) return;
+            var p = (ObjectBox)sender;
+            moveSelectObjs(p, e, true);
+
+            dragFore = false;
+            objDrag = false;
+            dragStartPoint = null;
+            p.Capture = false;
+            redraw(this);
+
+            foreach (var j in selectObjs)
+            {
+                dragStartObjPoses[j] = null;
+                objBoxes[j].Visible = true;
+            }
+        }
+
+        void objMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!objDrag) return;
+            var p = (ObjectBox)sender;
+
+            bool moving = moveSelectObjs(p, e, false);
+
+            if (!dragFore && moving)
+            {
+                var perm = (
+                    from i in Enumerable.Range(0, objPlaceList.Count)
+                    orderby Tuple.Create(selectObjs.Contains(i), i)
+                    select i).ToArray();
+                changeObjectID(perm);
+                dragFore = true;
+            }
+            redraw(this);
+        }
+
+        void objMouseCaptureChanged(object sender, EventArgs e)
+        {
+            var p = (ObjectBox)sender;
+            if (!p.Capture && objDrag)
+            {
+                objDrag = false;
+                dragStartPoint = null;
+                redraw(this);
+
+                foreach (var j in selectObjs)
+                {
+                    dragStartObjPoses[j] = null;
+                    moveObject(j, objPlaceList[j].x, objPlaceList[j].y, true);
+                    objBoxes[j].Visible = true;
+                }
+            }
+        }
+
+        void swapWithIndex<T>(List<T> o, int i, int j)
+        {
+            var tmp = o[i];
+            o[i] = o[j];
+            o[j] = tmp;
+        }
+
+        /// <summary>
+        /// オブジェクトをIDだけ変える。perm[i]をiへ移動させる
+        /// </summary>
+        /// <param name="perm">移動の順列の逆。順列であることが仮定される</param>
+        void changeObjectID(int[] perm)
+        {
+            var num = objPlaceList.Count;
+            var tmpObjPlaceList = new ObjPlace[num];
+            objPlaceList.CopyTo(tmpObjPlaceList);
+            var tmpObjPictureBoxes = new ObjectBox[num];
+            objBoxes.CopyTo(tmpObjPictureBoxes);
+            var tmpSelectObjs = new int[selectObjs.Count];
+            selectObjs.CopyTo(tmpSelectObjs);
+            var tmpDragStartObjPoses = new Point?[num];
+            dragStartObjPoses.CopyTo(tmpDragStartObjPoses);
+
+            selectObjs.Clear();
+            for (var i = 0; i < num; i++)
+            {
+                objPlaceList[i] = tmpObjPlaceList[perm[i]];
+                objBoxes[i] = tmpObjPictureBoxes[perm[i]];
+                dragStartObjPoses[i] = tmpDragStartObjPoses[perm[i]];
+                if (tmpSelectObjs.Contains(perm[i]))
+                    selectObjs.Add(i);
+                if (perm[i] != i)
+                    setObjectChildIndex(i);
+            }
         }
     }
 }

@@ -343,11 +343,29 @@ namespace YSedit
                 catch (Exception) { }
                 if (p == null || !p.bytes.SequenceEqual(firstObjPlaces.bytes))
                 {
-                    if (MessageBox.Show("Close?", "Close?", MessageBoxButtons.YesNo) == DialogResult.No)
+                    if (MessageBox.Show(this, "Close?", "Close?", MessageBoxButtons.YesNo) == DialogResult.No)
                         e.Cancel = true;
                 }
             }
             
+        }
+
+        private void dataGridView1_SortCompare(object sender, DataGridViewSortCompareEventArgs e)
+        {
+            if (e.Column.Index == 4 || e.Column.Index == 5)
+            {
+                var x = ((string)e.CellValue1).tryFloatFromHexString();
+                var y = ((string)e.CellValue2).tryFloatFromHexString();
+                if (x == null && y == null)
+                    e.SortResult = 0;
+                else if (x == null)
+                    e.SortResult = -1;
+                else if (y == null)
+                    e.SortResult = 1;
+                else
+                    e.SortResult = x.Value.CompareTo(y.Value);
+                e.Handled = true;
+            }
         }
 
     }

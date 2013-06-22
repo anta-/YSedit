@@ -303,18 +303,18 @@
             // 
             // hScrollBar1
             // 
-            this.hScrollBar1.Location = new System.Drawing.Point(0, 248);
+            this.hScrollBar1.Location = new System.Drawing.Point(0, 230);
             this.hScrollBar1.Name = "hScrollBar1";
-            this.hScrollBar1.Size = new System.Drawing.Size(80, 17);
+            this.hScrollBar1.Size = new System.Drawing.Size(275, 17);
             this.hScrollBar1.TabIndex = 3;
             this.hScrollBar1.ValueChanged += new System.EventHandler(this.scrollBar1_ValueChanged);
             this.hScrollBar1.MouseCaptureChanged += new System.EventHandler(this.scrollBar1_MouseCaptureChanged);
             // 
             // vScrollBar1
             // 
-            this.vScrollBar1.Location = new System.Drawing.Point(296, 24);
+            this.vScrollBar1.Location = new System.Drawing.Point(278, 24);
             this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(17, 80);
+            this.vScrollBar1.Size = new System.Drawing.Size(17, 203);
             this.vScrollBar1.TabIndex = 4;
             this.vScrollBar1.ValueChanged += new System.EventHandler(this.scrollBar1_ValueChanged);
             this.vScrollBar1.MouseCaptureChanged += new System.EventHandler(this.scrollBar1_MouseCaptureChanged);
@@ -324,11 +324,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 332);
+            this.Controls.Add(this.menuStrip1);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.vScrollBar1);
             this.Controls.Add(this.hScrollBar1);
-            this.Controls.Add(this.menuStrip1);
             this.Controls.Add(this.pictureBox1);
-            this.Controls.Add(this.statusStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "Form1";
             this.Text = "YSedit";

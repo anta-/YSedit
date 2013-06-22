@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace YSedit
 {
@@ -138,6 +140,19 @@ namespace YSedit
             return f;
         }
 
+        public static float? tryFloatFromHexString(this string s)
+        {
+            if (s == null) return null;
+            try
+            {
+                return s.floatFromHexString();
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+        }
+
         /// <summary>
         /// 一番MSBに近いビットの位置(LSBから)を返す
         /// </summary>
@@ -151,5 +166,47 @@ namespace YSedit
             }
             return res;
         }
+    }
+}
+
+static class WindowsUtil
+{
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr lParam);
+    public static IntPtr SendMessage(this Control control, UInt32 Msg, IntPtr wParam, IntPtr lParam)
+    {
+        return SendMessage(control.Handle, Msg, wParam, lParam);
+    }
+    public static IntPtr SendMessage(this Control control, UInt32 Msg, uint wParam, uint lParam)
+    {
+        return SendMessage(control.Handle, Msg, new IntPtr(wParam), new IntPtr(lParam));
+    }
+
+    private const int WM_SETREDRAW = 11;
+
+    public static void SuspendDrawing(this Control c)
+    {
+        c.SendMessage(WM_SETREDRAW, 0, 0);
+    }
+
+    public static void ResumeDrawing(this Control c, bool refresh = true)
+    {
+        c.SendMessage(WM_SETREDRAW, 1, 0);
+        if (refresh)
+            c.Refresh();
+    }
+
+    [DllImport("User32.dll", SetLastError = true)]
+    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    [DllImport("User32.dll", SetLastError = true)]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+
+    public static int SetWindowLong(this Control control, int nIndex, int dwNewLong)
+    {
+        return SetWindowLong(control.Handle, nIndex, dwNewLong);
+    }
+    public static int GetWindowLong(this Control control, int nIndex)
+    {
+        return GetWindowLong(control.Handle, nIndex);
     }
 }
