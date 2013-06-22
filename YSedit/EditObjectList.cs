@@ -333,6 +333,7 @@ namespace YSedit
 
         private void EditObjectList_FormClosing(object sender, FormClosingEventArgs e)
         {
+            dataGridView1.EndEdit();
             if (DialogResult == DialogResult.Cancel)
             {
                 Data p = null;

@@ -12,6 +12,7 @@ namespace YSedit
 {
     public partial class Form1 : Form
     {
+        const string appTitle = "YSedit v0.1";
 
         ROM rom = null;
         MainView mainView = null;
@@ -180,6 +181,7 @@ namespace YSedit
         void romChangedChanged(bool changed)
         {
             saveMapToolStripMenuItem.Enabled = changed;
+            Text = appTitle + (changed ? " *" : "");
         }
 
         /// <summary>
@@ -208,6 +210,15 @@ namespace YSedit
         private void mapInformationToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MessageBox.Show(rom.map.getMapInformationStr(), "Map information");
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (rom != null)
+            {
+                if (closeRomFile())
+                    e.Cancel = true;
+            }
         }
     }
 }
