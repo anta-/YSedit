@@ -224,8 +224,8 @@ namespace YSedit
         void deleteObj(int i)
         {
             objList.RemoveAt(i);
+            objBoxes[i].Dispose();
             objBoxes.RemoveAt(i);
-            pictureBox.Controls.RemoveAt(i);
             dragStartObjPoses.RemoveAt(i);
             if (selectObjs.Contains(i))
                 selectObjs.Remove(i);

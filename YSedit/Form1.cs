@@ -58,7 +58,7 @@ namespace YSedit
 
         private void openMapNumberToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var dialog = new OpenMapNumber();
+            var dialog = new OpenMapNumber(rom.map.currentMapNumber);
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 try
@@ -152,6 +152,10 @@ namespace YSedit
                 proceeded = true;
             }
             catch (System.IO.IOException)
+            {
+                err("Can't open ROM file");
+            }
+            catch (UnauthorizedAccessException)
             {
                 err("Can't open ROM file");
             }

@@ -11,9 +11,10 @@ namespace YSedit
 {
     public partial class OpenMapNumber : Form
     {
-        public OpenMapNumber()
+        public OpenMapNumber(uint defaultMapNumber)
         {
             InitializeComponent();
+            mapNumber.Text = defaultMapNumber.ToString("x2");
         }
 
         private void OK_Click(object sender, EventArgs e)

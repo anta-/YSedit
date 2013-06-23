@@ -67,6 +67,7 @@ namespace YSedit
         /// pathのファイルを開く
         /// </summary>
         /// <exception cref="System.IO.IOException">ファイルが開けなかった時</exception>
+        /// <exception cref="UnauthorizedAccessException">ファイルが開けなかった時</exception>
         /// <exception cref="ROM.UnknownROMException">ROMのバージョンが不明・ROMファイルでない場合</exception>
         /// <exception cref="DataException">ROMファイル中におかしなデータがあった場合</exception>
         public ROM(string path)
@@ -102,8 +103,11 @@ namespace YSedit
             if(map_ != null)
                 closeMap();
 
-            romFile.Close();
-            romFile = null;
+            if (romFile != null)
+            {
+                romFile.Close();
+                romFile = null;
+            }
         }
 
         public class UnknownROMException : ApplicationException
@@ -270,16 +274,19 @@ namespace YSedit
         /// ROMファイルに変更を書き込む
         /// </summary>
         /// <exception cref="DataException">ROMファイル中におかしなデータがあった場合</exception>
+        /// <exception cref="NeedExpansionException">ROMの空き領域が足りない場合</exception>
         public void saveToROM()
         {
             if (map_ == null)
                 return;
 
             yseditInfo = readYSeditInfo();
+            bool modInstall = false;
             if (yseditInfo.magic != YSeditInfo.Magic) {
                 installMod();
                 yseditInfo = readYSeditInfo();
-                }
+                modInstall = true;
+            }
 
             saveObjPlaces();
 
@@ -287,6 +294,8 @@ namespace YSedit
             yseditInfo = null;
 
             romFile.Flush();
+            Program.showInfo("Map " + map.currentMapNumber.ToString("x2") + " saved to ROM" +
+                (modInstall ? ", Mod installed" : ""));
             
             if (changed)
             {
