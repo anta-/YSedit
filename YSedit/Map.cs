@@ -36,7 +36,7 @@ namespace YSedit
             rom = rom_;
             romIF = rom.romIF;
             this.mainView = mainView;
-            mainView.onChanged += () => rom.newChange(true);
+            mainView.onChanged += () => { rom.newChange(true); };
 
             if (romIF.mapNumbers <= mapNumber)
                 throw new ArgumentException("map number is too big");

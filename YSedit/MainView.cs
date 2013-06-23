@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using Input = System.Windows.Input;
 
 namespace YSedit
 {
@@ -107,9 +106,15 @@ namespace YSedit
 
         HashSet<int> selectObjs = new HashSet<int>();
         bool objDrag = false;
+        ObjectBox dragStartControl = null;
         bool dragFore = false;
         Point? dragStartPoint;
         List<Point?> dragStartObjPoses;
+
+        bool rectSelecting = false;
+        Point? selectionStartPoint = null;
+        Rectangle? selectionRect = null;
+        int[] selectObjsAtSelectionStart;
 
         public MainView(Panel panel, ROMInterface romIF)
         {
@@ -188,7 +193,42 @@ namespace YSedit
             }
         }
 
+        int? addObj(Obj p)
+        {
+            int i = objList.Count;
+            if (i >= romIF.numberOfObjPlacesMax)
+                return null;
 
+            objList.Add(p);
+            var b = new ObjectBox(this);
+            var rect = p.rect.SubMove(currentScroll);
+            b.Location = rect.Location;
+            b.Size = rect.Size;
+
+            b.MouseHover += tooltipPopup;
+            b.MouseDown += objMouseDown;
+            b.MouseUp += objMouseUp;
+            b.MouseMove += objMouseMove;
+            b.MouseCaptureChanged += objMouseCaptureChanged;
+            objBoxes.Add(b);
+            pictureBox.Controls.Add(b);
+            setObjectChildIndex(i);
+
+            dragStartObjPoses.Add(null);
+
+            return i;
+        }
+
+        void deleteObj(int i)
+        {
+            objList.RemoveAt(i);
+            objBoxes.RemoveAt(i);
+            pictureBox.Controls.RemoveAt(i);
+            dragStartObjPoses.RemoveAt(i);
+            if (selectObjs.Contains(i))
+                selectObjs.Remove(i);
+            changed();
+        }
 
         /// <summary>
         /// objPlacesを設定する
@@ -199,6 +239,7 @@ namespace YSedit
             int number = (int)(objPlaces.bytes.Length / romIF.objPlaceC_size);
             objList = new List<Obj>(number);
             objBoxes = new List<ObjectBox>(number);
+            dragStartObjPoses = new List<Point?>(number);
 
             pictureBox.SuspendDrawing();
             pictureBox.Controls.Clear();
@@ -210,24 +251,10 @@ namespace YSedit
                     objPlaces.getHalf(o + romIF.objPlace_info),
                     objPlaces.getFloat(o + romIF.objPlace_xpos),
                     objPlaces.getFloat(o + romIF.objPlace_ypos));
-                objList.Add(p);
-                var b = new ObjectBox(this);
-                var rect = p.rect.SubMove(currentScroll);
-                b.Location = rect.Location;
-                b.Size = rect.Size;
-                
-                b.MouseHover += tooltipPopup;
-                b.MouseDown += objMouseDown;
-                b.MouseUp += objMouseUp;
-                b.MouseMove += objMouseMove;
-                b.MouseCaptureChanged += objMouseCaptureChanged;
-                objBoxes.Add(b);
-                pictureBox.Controls.Add(b);
-                setObjectChildIndex(i);
+                addObj(p);
             }
 
             selectObjs.Clear();
-            dragStartObjPoses = Enumerable.Repeat<Point?>(null, number).ToList();
 
             movingEnd();
             redraw();
@@ -299,11 +326,23 @@ namespace YSedit
         void objMouseDown(object sender, MouseEventArgs e)
         {
             var p = (ObjectBox)sender;
+            if (e.Button.HasFlag(MouseButtons.Right))
+            {
+                mouseRightDown(p.Location.Add(e.Location) + currentScroll);
+                return;
+            }
+
+            dragStart(p, pictureBox.PointToClient(p.PointToScreen(e.Location)) + currentScroll);
+        }
+
+        /// <param name="pos">スクロール済み座標</param>
+        void dragStart(ObjectBox p, Point pos)
+        {
             var i = objBoxes.IndexOf(p);
             if (selectObjs.Contains(i))
             {
             }
-            else if (getKey(Input.Key.LeftCtrl) || getKey(Input.Key.RightCtrl))
+            else if (Control.ModifierKeys.HasFlag(Keys.Control))
             {
                 selectObjs.Add(i);
             }
@@ -312,10 +351,13 @@ namespace YSedit
                 selectObjs.Clear();
                 selectObjs.Add(i);
             }
+            infoObjSelected();
+
             p.Capture = true;
+            dragStartControl = p;
             objDrag = true;
             dragFore = false;
-            dragStartPoint = pictureBox.PointToClient(p.PointToScreen(e.Location)) + currentScroll;
+            dragStartPoint = pos;
 
             foreach (var j in selectObjs)
             {
@@ -324,29 +366,28 @@ namespace YSedit
             }
         }
 
+        void changed()
+        {
+            if (onChanged != null) onChanged();
+        }
+
         void moveObject(int i, float x, float y)
         {
-            if ((objList[i].x != x ||
-                objList[i].y != y) &&
-                onChanged != null) onChanged();
+            if (objList[i].x != x ||
+                objList[i].y != y) changed();
             objList[i].x = x;
             objList[i].y = y;
         }
 
-        bool getKey(Input.Key key)
-        {
-            return Input.Keyboard.GetKeyStates(key).HasFlag(Input.KeyStates.Down);
-        }
-
         int fitMoving(int x)
         {
-            if (getKey(Input.Key.LeftShift) || getKey(Input.Key.RightShift))
+            if (Control.ModifierKeys.HasFlag(Keys.Shift))
             {   //1ずつ動かすモード
                 return x;
             }
             else
             {   //8ずつ動かすモード
-                return (x + 4) / 8 * 8;
+                return (Math.Abs(x) + 4) / 8 * 8 * Math.Sign(x);
             }
         }
 
@@ -366,6 +407,9 @@ namespace YSedit
                 moveObject(i, t.X, t.Y);
             }
 
+            if (dragFore || dx != 0 || dy != 0)
+                Program.showInfo("Move objects " + dx.formatSigned() + " x " + dy.formatSigned());
+
             return dx != 0 || dy != 0;
         }
 
@@ -379,7 +423,7 @@ namespace YSedit
             if (!objDrag) return;
             var p = (ObjectBox)sender;
 
-            endDrag(p);
+            endDrag();
         }
 
         void objMouseMove(object sender, MouseEventArgs e)
@@ -405,14 +449,16 @@ namespace YSedit
             redraw();
         }
 
-        void endDrag(ObjectBox p)
+        void endDrag()
         {
+            var p = dragStartControl;
             moveSelectObjs(p, getMouseClientPos(p));
 
             dragFore = false;
             objDrag = false;
             dragStartPoint = null;
             p.Capture = false;
+            dragStartControl = null;
             
             movingEnd();
             redraw();
@@ -422,6 +468,8 @@ namespace YSedit
                 dragStartObjPoses[j] = null;
                 objBoxes[j].Visible = true;
             }
+
+            infoObjSelected();
         }
 
         /// <summary>
@@ -448,7 +496,7 @@ namespace YSedit
             var p = (ObjectBox)sender;
             if (!p.Capture && objDrag)
             {
-                endDrag(p);
+                endDrag();
             }
         }
 
@@ -549,7 +597,6 @@ namespace YSedit
         int redrawCount = 0;
         void redraw()
         {
-            Program.form.setInfoStatusText(redrawCount.ToString());
             redrawCount++;
 
             if (pictureBox.Width <= 0 ||
@@ -595,15 +642,17 @@ namespace YSedit
                 redraw();
         }
 
-        bool rectSelecting = false;
-        Point? selectionStartPoint = null;
-        Rectangle? selectionRect = null;
-        int[] selectObjsAtSelectionStart;
-
         void mouseDown(object sender, MouseEventArgs e)
         {
             Debug.Assert(!objDrag);
-            if (!(getKey(Input.Key.LeftCtrl) || getKey(Input.Key.RightCtrl)))
+
+            if (e.Button.HasFlag(MouseButtons.Right))
+            {
+                mouseRightDown(e.Location + currentScroll);
+                return;
+            }
+
+            if (!Control.ModifierKeys.HasFlag(Keys.Control))
             {
                 selectObjs.Clear();
             }
@@ -622,6 +671,10 @@ namespace YSedit
             dragScroll(e.Location);
             selectionRect = selectionStartPoint.Value.TwoPoints(
                 e.Location + currentScroll);
+            Program.showInfo("Selection " +
+                selectionRect.Value.Width.ToString("x") + " x " +
+                selectionRect.Value.Height.ToString("x"));
+
             selectObjs = new HashSet<int>(selectObjsAtSelectionStart);
             for (var i = 0; i < objList.Count; i++)
             {
@@ -658,6 +711,77 @@ namespace YSedit
             selectObjsAtSelectionStart = null;
             selectionRect = null;
             movingEnd();
+            redraw();
+            infoObjSelected();
+        }
+
+        void infoObjSelected()
+        {
+            if (selectObjs.Count != 0)
+                Program.showInfo(selectObjs.Count.ToString("x") + " objects selected");
+            else
+                Program.showInfo("");
+        }
+
+        /// <summary>
+        /// 選択中のオブジェクトをコピーする
+        /// </summary>
+        /// <param name="pos">スクロール済み</param>
+        void mouseRightDown(Point pos)
+        {
+            if (selectObjs.Count == 0)
+                return;
+
+            Point originPos = new Point(
+                Enumerable.Min((IEnumerable<int>)selectObjs, (int i) => (int)objList[i].x),
+                Enumerable.Min((IEnumerable<int>)selectObjs, (int i) => (int)objList[i].y)
+                );
+            List<int> addedObjs = new List<int>();
+            foreach (var i in selectObjs)
+            {
+                var p = objList[i];
+                int? j = addObj(new Obj(p.kind, p.info,
+                    p.x - originPos.X + pos.X,
+                    p.y - originPos.Y + pos.Y));
+                if (j == null)
+                {
+                    Program.showError("Objects is too many!");
+                    break;
+                }
+                addedObjs.Add(j.Value);
+                changed();
+            }
+            selectObjs.Clear();
+            foreach (var j in addedObjs)
+                selectObjs.Add(j);
+
+            if (selectObjs.Count() != 0)
+            {
+                int k = selectObjs.First();
+                dragStart(objBoxes[k], pos);
+            }
+
+            redraw();
+        }
+
+        public void keyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+                deleteSelectObject();
+        }
+
+        void deleteSelectObject()
+        {
+            if (objDrag)
+                endDrag();
+            if (rectSelecting)
+                endSelecting();
+            int[] tmpSelectObjs = new int[selectObjs.Count];
+            selectObjs.CopyTo(tmpSelectObjs);
+            tmpSelectObjs = tmpSelectObjs.OrderByDescending(x => x).ToArray();
+            foreach (var i in tmpSelectObjs)
+                deleteObj(i);
+            
             redraw();
         }
     }

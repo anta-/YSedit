@@ -24,5 +24,15 @@ namespace YSedit
             Application.Run(form);
         }
 
+        public static void showInfo(string s)
+        {
+            form.setInfoStatusText(s);
+        }
+
+        public static void showError(string s)
+        {
+            form.setInfoStatusText("Error: " + s);
+            System.Media.SystemSounds.Exclamation.Play();
+        }
     }
 }

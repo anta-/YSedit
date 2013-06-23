@@ -23,6 +23,14 @@ namespace YSedit
             return x;
         }
 
+        public static string formatSigned(this int x, string format = "x")
+        {
+            if (x < 0)
+                return "-" + Math.Abs(x).ToString(format);
+            else
+                return x.ToString(format);
+        }
+
         public static uint floatToWord(float f)
         {
             return (uint)BitConverter.ToInt32(BitConverter.GetBytes(f), 0);

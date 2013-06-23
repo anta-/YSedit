@@ -220,5 +220,11 @@ namespace YSedit
                     e.Cancel = true;
             }
         }
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (mainView != null)
+                mainView.keyDown(sender, e);
+        }
     }
 }

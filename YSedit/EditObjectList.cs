@@ -344,7 +344,7 @@ namespace YSedit
                 catch (Exception) { }
                 if (p == null || !p.bytes.SequenceEqual(firstObjPlaces.bytes))
                 {
-                    if (MessageBox.Show(this, "Close?", "Close?", MessageBoxButtons.YesNo) == DialogResult.No)
+                    if (MessageBox.Show(this, "", "Close?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
                         e.Cancel = true;
                 }
             }

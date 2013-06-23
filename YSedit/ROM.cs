@@ -118,7 +118,7 @@ namespace YSedit
         {
             if (changed)
             {
-                DialogResult res = MessageBox.Show("Save map to ROM?", "", MessageBoxButtons.YesNoCancel);
+                DialogResult res = MessageBox.Show("Save map to ROM?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
                 if(res == DialogResult.Cancel)
                     throw new UserCancel();
                 else if (res == DialogResult.Yes)
