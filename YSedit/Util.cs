@@ -177,9 +177,25 @@ namespace YSedit
         {
             return new Point(p.X + q.X, p.Y + q.Y);
         }
+        public static Rectangle AddMove(this Rectangle r, Size x)
+        {
+            return new Rectangle(r.Location + x, r.Size);
+        }
+        public static Rectangle AddResize(this Rectangle r, Size x)
+        {
+            return new Rectangle(r.Location, r.Size + x);
+        }
         public static Point Sub(this Point p, Point q)
         {
             return new Point(p.X - q.X, p.Y - q.Y);
+        }
+        public static Rectangle SubResize(this Rectangle r, Size x)
+        {
+            return new Rectangle(r.Location, r.Size - x);
+        }
+        public static Rectangle SubMove(this Rectangle r, Size x)
+        {
+            return new Rectangle(r.Location - x, r.Size);
         }
         public static Size Mult(this Size x, int y)
         {
@@ -202,7 +218,7 @@ namespace YSedit
 
         public static Rectangle TwoPoints(this Point p, Point q)
         {
-            return new Rectangle(p, (Size)q.Sub(p));
+            return new Rectangle(p, (Size)q.Sub(p)).Normalize();
         }
 
         public static Point Min2(this Point p, Point q)
@@ -213,6 +229,20 @@ namespace YSedit
         public static Point Max2(this Point p, Point q)
         {
             return new Point(Math.Max(p.X, q.X), Math.Max(p.Y, q.Y));
+        }
+
+        public static Rectangle Normalize(this Rectangle x)
+        {
+            if (x.Width < 0) {
+                x.X = x.Right;
+                x.Width *= -1;
+            }
+            if (x.Height < 0)
+            {
+                x.Y = x.Bottom;
+                x.Height *= -1;
+            }
+            return x;
         }
     }
 
