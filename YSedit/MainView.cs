@@ -134,6 +134,8 @@ namespace YSedit
             hScrollBar = new HScrollBar();
             vScrollBar.Top = 0;
             hScrollBar.Left = 0;
+            vScrollBar.SmallChange = 16;
+            hScrollBar.SmallChange = 16;
             vScrollBar.MouseCaptureChanged += scrollBar_MouseCaptureChanged;
             hScrollBar.MouseCaptureChanged += scrollBar_MouseCaptureChanged;
             vScrollBar.ValueChanged += scrollBar_ValueChanged;
@@ -272,6 +274,8 @@ namespace YSedit
             var t = new ToolTip();
             var p = (ObjectBox)sender;
             var i = objBoxes.IndexOf(p);
+            if (i == -1)
+                return;
             var o = objList[i];
             var namee = ObjectName.getObjectName(o.kind, ObjectName.Language.English);
             var namej = ObjectName.getObjectName(o.kind, ObjectName.Language.Japanese);
@@ -379,7 +383,7 @@ namespace YSedit
             objList[i].y = y;
         }
 
-        int fitMoving(int x)
+        int fitGrid(int x)
         {
             if (Control.ModifierKeys.HasFlag(Keys.Shift))
             {   //1ずつ動かすモード
@@ -394,8 +398,8 @@ namespace YSedit
         bool moveSelectObjs(ObjectBox p, Point pos)
         {
             pos += currentScroll;
-            int dx = fitMoving(pos.X - dragStartPoint.Value.X),
-                dy = fitMoving(pos.Y - dragStartPoint.Value.Y);
+            int dx = fitGrid(pos.X - dragStartPoint.Value.X),
+                dy = fitGrid(pos.Y - dragStartPoint.Value.Y);
 
             foreach (var i in selectObjs)
             {
@@ -729,6 +733,7 @@ namespace YSedit
         /// <param name="pos">スクロール済み</param>
         void mouseRightDown(Point pos)
         {
+            pos = new Point(fitGrid(pos.X), fitGrid(pos.Y));
             if (selectObjs.Count == 0)
                 return;
 

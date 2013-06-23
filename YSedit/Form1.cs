@@ -12,7 +12,7 @@ namespace YSedit
 {
     public partial class Form1 : Form
     {
-        const string appTitle = "YSedit v0.1";
+        const string appTitle = "YSedit";
 
         ROM rom = null;
         MainView mainView = null;
@@ -225,6 +225,12 @@ namespace YSedit
         {
             if (mainView != null)
                 mainView.keyDown(sender, e);
+        }
+
+        private void saveMapToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (rom != null)
+                rom.saveToROM();
         }
     }
 }

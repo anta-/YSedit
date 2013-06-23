@@ -112,6 +112,7 @@
             this.saveMapToolStripMenuItem.Name = "saveMapToolStripMenuItem";
             this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
             this.saveMapToolStripMenuItem.Text = "&Save Map to ROM";
+            this.saveMapToolStripMenuItem.Click += new System.EventHandler(this.saveMapToolStripMenuItem_Click);
             // 
             // mapEditToolStripMenuItem
             // 

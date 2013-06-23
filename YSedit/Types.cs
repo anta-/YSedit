@@ -132,6 +132,10 @@ namespace YSedit
         {
             return (uint)(getHalf(offset) << 16 | getHalf(offset + 2));
         }
+        public ulong getDWord(uint offset)
+        {
+            return (ulong)((ulong)getWord(offset) << 32 | getWord(offset + 4));
+        }
         public void setByte(uint offset, byte val)
         {
             bytes[offset] = val;
@@ -139,12 +143,17 @@ namespace YSedit
         public void setHalf(uint offset, ushort val)
         {
             setByte(offset, (byte)(val >> 8));
-            setByte(offset+1, (byte)(val & 0xff));
+            setByte(offset + 1, (byte)(val & 0xff));
         }
         public void setWord(uint offset, uint val)
         {
             setHalf(offset, (ushort)(val >> 16));
-            setHalf(offset+2, (ushort)(val & 0xffff));
+            setHalf(offset + 2, (ushort)(val & 0xffff));
+        }
+        public void setDWord(uint offset, ulong val)
+        {
+            setWord(offset, (uint)(val >> 32));
+            setWord(offset + 4, (uint)(val & 0xffffffff));
         }
 
         public float getFloat(uint offset) { return Util.wordToFloat(getWord(offset)); }

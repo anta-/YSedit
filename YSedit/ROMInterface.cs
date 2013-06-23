@@ -41,6 +41,14 @@ namespace YSedit
         public readonly uint ustruct5_size;
         public readonly uint uttruct5_iUStruct3;
 
+        public readonly RomAddress headerModAddr1;
+        public readonly RomAddress headerModAddr2;
+        public readonly byte headerModByte1;
+        public readonly byte headerModByte2;
+
+        public readonly RomAddress freeSpaceAddr;
+        public readonly uint freeSpaceSize;
+
         public ROMInterface(Ver ver_)
         {
             ver = ver_;
@@ -66,6 +74,13 @@ namespace YSedit
 
             ustruct5_size = 8;
             uttruct5_iUStruct3 = 4;
+
+            headerModAddr1 = 0x67f;
+            headerModAddr2 = 0x68b;
+            headerModByte1 = 0x63;
+            headerModByte2 = 0xba;
+            freeSpaceAddr = 0xe67fd0;
+            freeSpaceSize = 0x1000000 - freeSpaceAddr.x;
 
             switch (ver)
             {
