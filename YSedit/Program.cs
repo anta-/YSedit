@@ -17,7 +17,7 @@ namespace YSedit
         [STAThread]
         static void Main()
         {
-            ObjectName.init();
+            ObjectInfo.init();
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             form = new Form1();

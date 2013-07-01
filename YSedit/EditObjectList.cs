@@ -20,7 +20,8 @@ namespace YSedit
         readonly Data firstObjPlaces;
 
         uint unknownKindValue = 0xffffffff;
-        readonly Dictionary<uint, string> objNameMap;
+        readonly List<ObjectInfo.KindNameDesc> objNames;
+        readonly HashSet<uint> knownObjs;
 
         public EditObjectList(ROMInterface romIF_, Data objPlaces_)
         {
@@ -31,12 +32,13 @@ namespace YSedit
 
 
             DataGridViewComboBoxColumn c = (DataGridViewComboBoxColumn)dataGridView1.Columns[2];
-            objNameMap = ObjectName.getEnMap;
-            var dataSource = objNameMap.ToList();
-            dataSource.Insert(0, new KeyValuePair<uint,string>(unknownKindValue, ""));
-            c.DataSource = dataSource.OrderBy(x => x.Value).ToArray();
-            c.ValueMember = "Key";
-            c.DisplayMember = "Value";
+            objNames = ObjectInfo.getCanPlaceObjectNames(ObjectInfo.Language.Japanese);
+            var dataSource = objNames;
+            dataSource.Insert(0, new ObjectInfo.KindNameDesc(unknownKindValue, "", ""));
+            c.DataSource = dataSource.OrderBy(x => x.name).ToArray();
+            c.ValueMember = "Kind";
+            c.DisplayMember = "Name";
+            knownObjs = new HashSet<uint>(objNames.Select(x => x.kind));
 
             uint objs = (uint)firstObjPlaces.bytes.Length / romIF.objPlaceC_size;
 
@@ -47,16 +49,11 @@ namespace YSedit
                 dataGridView1.Rows.Add(
                     formatCellValue((uint)i, 0),
                     formatCellValue(kind, 1),
-                    objNameMap.ContainsKey(kind) ? kind : unknownKindValue,
+                    knownObjs.Contains(kind) ? kind : unknownKindValue,
                     formatCellValue((uint)firstObjPlaces.getHalf(p + romIF.objPlace_info), 3),
                     formatCellValue(firstObjPlaces.getFloat(p + romIF.objPlace_xpos), 4),
                     formatCellValue(firstObjPlaces.getFloat(p + romIF.objPlace_ypos), 5));
             }
-        }
-
-        string getObjectNameDisplayString(uint i)
-        {
-            return ObjectName.getObjectName(i, ObjectName.Language.English);
         }
 
         private void Cancel_Click(object sender, EventArgs e)
@@ -285,7 +282,7 @@ namespace YSedit
                 else
                 {
                     var kind = parseCellValue((string)kindCell.Value, kindCell.ColumnIndex);
-                    if (kind != null && objNameMap.ContainsKey((uint)kind))
+                    if (kind != null && knownObjs.Contains((uint)kind))
                     {
                         cell.Value = (uint)kind;
                     }
@@ -320,7 +317,7 @@ namespace YSedit
 
             if (cell.ColumnIndex == 1)
                 dataGridView1.Rows[cell.RowIndex].Cells[2].Value =
-                    value != null && objNameMap.ContainsKey((uint)value) ? value : unknownKindValue;
+                    value != null && knownObjs.Contains((uint)value) ? value : unknownKindValue;
         }
 
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
@@ -368,6 +365,5 @@ namespace YSedit
                 e.Handled = true;
             }
         }
-
     }
 }

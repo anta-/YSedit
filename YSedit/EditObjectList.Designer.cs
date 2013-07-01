@@ -29,17 +29,17 @@
         private void InitializeComponent()
         {
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.OK = new System.Windows.Forms.Button();
+            this.Cancel = new System.Windows.Forms.Button();
+            this.Insert = new System.Windows.Forms.Button();
+            this.Remove = new System.Windows.Forms.Button();
+            this.Clone = new System.Windows.Forms.Button();
             this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Kind = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ObjName = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.Info = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PosX = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.PosY = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OK = new System.Windows.Forms.Button();
-            this.Cancel = new System.Windows.Forms.Button();
-            this.Insert = new System.Windows.Forms.Button();
-            this.Remove = new System.Windows.Forms.Button();
-            this.Clone = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -71,49 +71,6 @@
             this.dataGridView1.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellEndEdit);
             this.dataGridView1.CurrentCellChanged += new System.EventHandler(this.dataGridView1_CurrentCellChanged);
             this.dataGridView1.SortCompare += new System.Windows.Forms.DataGridViewSortCompareEventHandler(this.dataGridView1_SortCompare);
-            // 
-            // ID
-            // 
-            this.ID.HeaderText = "ID";
-            this.ID.MaxInputLength = 2;
-            this.ID.Name = "ID";
-            this.ID.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.ID.Width = 20;
-            // 
-            // Kind
-            // 
-            this.Kind.HeaderText = "Kind";
-            this.Kind.MaxInputLength = 4;
-            this.Kind.Name = "Kind";
-            this.Kind.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Kind.Width = 30;
-            // 
-            // ObjName
-            // 
-            this.ObjName.HeaderText = "Name";
-            this.ObjName.Name = "ObjName";
-            this.ObjName.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.ObjName.Width = 200;
-            // 
-            // Info
-            // 
-            this.Info.HeaderText = "Info";
-            this.Info.MaxInputLength = 4;
-            this.Info.Name = "Info";
-            this.Info.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            this.Info.Width = 30;
-            // 
-            // PosX
-            // 
-            this.PosX.HeaderText = "PosX";
-            this.PosX.Name = "PosX";
-            this.PosX.Resizable = System.Windows.Forms.DataGridViewTriState.False;
-            // 
-            // PosY
-            // 
-            this.PosY.HeaderText = "PosY";
-            this.PosY.Name = "PosY";
-            this.PosY.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             // 
             // OK
             // 
@@ -164,6 +121,49 @@
             this.Clone.Text = "Clone";
             this.Clone.UseVisualStyleBackColor = true;
             this.Clone.Click += new System.EventHandler(this.Clone_Click);
+            // 
+            // ID
+            // 
+            this.ID.HeaderText = "ID";
+            this.ID.MaxInputLength = 2;
+            this.ID.Name = "ID";
+            this.ID.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.ID.Width = 20;
+            // 
+            // Kind
+            // 
+            this.Kind.HeaderText = "Kind";
+            this.Kind.MaxInputLength = 4;
+            this.Kind.Name = "Kind";
+            this.Kind.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Kind.Width = 30;
+            // 
+            // ObjName
+            // 
+            this.ObjName.HeaderText = "Name";
+            this.ObjName.Name = "ObjName";
+            this.ObjName.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.ObjName.Width = 200;
+            // 
+            // Info
+            // 
+            this.Info.HeaderText = "Info";
+            this.Info.MaxInputLength = 4;
+            this.Info.Name = "Info";
+            this.Info.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            this.Info.Width = 30;
+            // 
+            // PosX
+            // 
+            this.PosX.HeaderText = "PosX";
+            this.PosX.Name = "PosX";
+            this.PosX.Resizable = System.Windows.Forms.DataGridViewTriState.False;
+            // 
+            // PosY
+            // 
+            this.PosY.HeaderText = "PosY";
+            this.PosY.Name = "PosY";
+            this.PosY.Resizable = System.Windows.Forms.DataGridViewTriState.False;
             // 
             // EditObjectList
             // 

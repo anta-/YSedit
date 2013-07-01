@@ -277,14 +277,17 @@ namespace YSedit
             if (i == -1)
                 return;
             var o = objList[i];
-            var namee = ObjectName.getObjectName(o.kind, ObjectName.Language.English);
-            var namej = ObjectName.getObjectName(o.kind, ObjectName.Language.Japanese);
+            var namej = ObjectInfo.getObjectName(o.kind, ObjectInfo.Language.Japanese);
+            var namee = ObjectInfo.getObjectName(o.kind, ObjectInfo.Language.English);
+            var descj = ObjectInfo.getObjectDescription(o.kind, ObjectInfo.Language.Japanese);
+            var desce = ObjectInfo.getObjectDescription(o.kind, ObjectInfo.Language.English);
             t.SetToolTip(p,
                 "#" + i.ToString("x2") + "\n" +
                 "Kind: " + o.kind.ToString("x4") + "\n" +
-                (namee == null ? "" :
-                "Name: " + namee + "\n" +
-                "(ja): " + namej + "\n") +
+                (namej == "" ? "" : "(ja): " + namej + "\n") +
+                (descj == "" ? "" : "      " + descj + "\n") +
+                (namee == "" ? "" : "(en): " + namee + "\n") +
+                (desce == "" ? "" : "      " + desce + "\n") +
                 "Info: " + o.info.ToString("x4") + "\n" +
                 "XPos: 0x" + o.x.floatToHexString() + " / " + o.x.ToString() + "\n" +
                 "YPos: 0x" + o.y.floatToHexString() + " / " + o.y.ToString());

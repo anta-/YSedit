@@ -1,0 +1,341 @@
+4001	Yoshi	
+4002	Egg	
+4003	Target	
+4006		
+4008	Coin effect	
+4009	Effect	
+400a	Star effect	
+400d		
+400e	Flush effect	
+400f	Bonus heart fluit	
+4010	Helth flower	
+4011	Petal	
+4012	Cloud of dust	
+4013		
+4014		
+4018	Fireworks	
+4019	Parachute	
+401b	Glitter effect	
+401e	Egg afterimage	
+401f	White Shy Guy	
+4020		
+4030	Apple	
+4031	Banana	
+4032	Watermelon	
+4033	Grape	
+4034	Melon	
+4035	Heart fluit	
+4037	Umbrella	
+4038	Goonie	
+403a	Shy Guy (03a)	
+403b	Spike (horizontal moving)	
+4041	Pogo Guy	
+4043	Shy Guy (043)	
+4044	Shy Guy (044)	
+4045	Shy Guy (045)	
+404d	Bone platform (left)	
+404f	Bone platform (right)	
+4050	Sinking bone platform (left)	
+4051	Sinking bone platform (right)	
+406b	Huffin' Puffin	
+406c	Thrown Huffin' Puffin	
+406e	Propeller lift	
+406f	Coin	
+4070	Movable coin	
+4074	Heart Coin	
+407b	Ball	
+407d	Seesaw (long)	
+407f	Seesaw (short)	
+4083	Branch point of the line rail	
+4085	'?' block (Heart Coin)	
+4086	Egg block	
+4088	Message	
+409e	Bumpty	
+40a0	Puffer's ball	
+40a1	Puffer	
+40a3	Don Bongo	
+40af	Lakitu (water)	
+40b0	Lakitu (spike ball)	
+40b1	Lakitu's cloud	
+40b3	Lakitu's Water	
+40b4	Spike ball	
+40b5	Fuzzy Wiggler	
+40b8	Surprise ball	
+40c5	Special heart	
+40c6	Lava effect	
+40d8	Line guided cloud	
+40e9	Wind	
+40ea	Bubble effect	
+40eb		
+40ec		
+40f9	Ball's invisible wall	
+4103		
+410c		
+4115	Melon box (fall)	
+4116		
+4127	Balloon Bully	
+4129	3Three-headed Bone Dragon	
+412c	Fire	
+412d	Fire afterimage	
+412e	Bone Dragon	
+4131	Bone bridge 1	
+4132	Bone bridge 2	
+4133	Bone bridge 3	
+4134	Bone bridge 4	
+413a	Lava Bubble	
+413c	Spark	
+413e	Pirate Guy's ship	
+4144	Bob-omb	
+4147	Start flag (time attack)	
+414a	Goal flag	
+414f	Buried melon	
+4152	Horizontal moving platform 1	
+4153	Horizontal moving platform 2	
+4159	Ascending platform	
+415a	Descending platform	
+415d	Horizontal moving platform (red)	
+4174	Platform generator (up)	
+4177	Platform generator (down)	
+417a	Platform remover (down)	
+417b	Platform remover (up)	
+417f	Popping Shy Guy (back)	
+4181	Popping Shy Guy (front)	
+4182	Fly Guy (apple)	
+4183	Fly Guy (banana)	
+4184	Fly Guy (watermelon)	
+4185	Fly Guy (grape)	
+4186	Fly Guy (melon)	
+4198	Shy Guy (apple)	
+4199	Shy Guy (banana)	
+419a	Shy Guy (watermelon)	
+419b	Shy Guy (grape)	
+419c	Shy Guy (melon)	
+41c7	Lava Ghost (left)	
+41ca	Snake (red, right)	
+41cb	Snake (red, left)	
+41cc	Snake (green)	
+41ce	Balloon Bully seed	
+41cf	Water	
+41d0	Lava Ghost (right)	
+41d1	Bubble (apple)	
+41d2	Bubble (banana)	
+41d3	Bubble (watermelon)	
+41d4	Bubble (grape)	
+41d5	Bubble (melon)	
+41d6	Bubble (heart fluit)	
+41d7	'?' bubble (Balloon Bully)	
+41dc	Tulip	
+41dd	Power Bee	
+41de		
+41df		
+41e7	Branching point 1 (left)	
+41e8	Branching point 2 (left)	
+41e9	Branching point 1 (right)	
+41ea	Branching point 2 (right)	
+41ec	Blargg	
+41fc		
+41fd..428f	Vase	
+4299..42ea	Door	
+42eb..42ff	Locked door	
+4301	Key	
+4302..4302	Warp pipe (short)	
+4340..435e	Warp pipe (middle)	
+436a..436e	Warp pipe (long)	
+437f..4382	Warp pipe (very long)	
+43c1..43da	Reverse warp pipe	
+43eb..43fb		
+440c	Pipe (short)	
+440d	Pipe (middle)	
+440e	Pipe (long)	
+440f	Pipe (very long)	
+444e..44ca	Page exit	
+44ca	Vase exit point	
+44cd	Rolling woods	
+44fe	Do-Drop	
+44ff	Do-Drop generator	
+4507	Miss Warp 1	
+4508	Miss Warp 2	
+4509	Miss Warp 3	
+450a	Miss Warp 4	
+450e	Fly Guy 4	
+4511	Big Blurp	
+4517	Spike (jump only)	
+451e	Teehee Butterfly (vertical)	
+451f	Teehee Butterfly (horizontal)	
+4525	Bee	
+4526	Peeper	
+4528	Peeper generator	
+452e	'?' bubble (parachute melon)	
+452f	'?' bubble (parachute heart fluit)	
+4531	Hidden '?' bubble (parachute melon)	
+4533	Horde of Fly Guy	
+4536	Pak Elephant Derm	
+4538	Melon boxes	
+4539	Tub	
+453a	Kettle, Bucket	
+453c	Melon box (going up)	
+4547	Lurking Shy Guy (top-left 1)	
+4548	Lurking Shy Guy (top-left 2)	
+4549	Lurking Shy Guy (left)	
+454b	Lurking Shy Guy (bottom)	
+454d	Lurking Shy Guy (top-right)	
+454e	Lurking Shy Guy (top)	
+4561	Spider	
+4564	Mr. Eel	
+456b	Hidden coin	
+456d	Peeper generate stop line	
+456e	Peeper generate start line	
+457c	Nipper Plant	
+457d	Nipper Plant (born)	
+4580	Nipper Spore	
+4581	Spore melon	
+4582	Stone	
+4584	Bill Blaster (left)	
+4586	Bill Blaster (up)	
+458d	Bill Blaster (homing)	
+458f	Bullet Bill	
+4591	Cloud (large)	
+4592	Cloud (medium)	
+4593	Cloud (small)	
+459f		
+45a0	Lakitu (stone)	
+45a3	Air Bag	
+45aa	Stilt Guy 1	
+45ab	Stilt Guy 2	
+45ac	Stilt Guy 3	
+45b3	Fly Guy (red pepper)	
+45b6	Red pepper	
+45bb	Secret melon point (egg)	
+45bc	Secret melon point (out)	
+45bd	Secret melon point (touch)	
+45bf	Three-headed Bone Dragon's head	
+45c1	Poochy (go)	
+45c4	Piece of chain	
+45c7	Poochy branching point 1	
+45c9	Poochy branching point 2	
+45cb	Melon-game Lakitu	
+45d1	Mr. Eel generator	
+45d2	Mr. Eel generator start line	
+45d3	Mr. Eel generator stop line	
+45da		
+45e3	Hidden melon	
+45e6	'!' switch	
+45ee	Rock	
+45ef	Piece of rock	
+45f1	Dragon	
+45f4	Hint block	
+45f6	Long jump game's melon point 1	
+45f7	Long jump game's melon point 2	
+45f8	Long jump game's melon point 3	
+45f9	Long jump game's melon point 4	
+45fa	Long jump game's melon point 5	
+45fb	Long jump game's melon point 6	
+45fc	Long jump game's melon point 7	
+4603	Rock (melon)	
+460e	Continuation '!' switch	
+460f	Hidden '!' switch	
+461c	Bomb Fluit	
+461d	Bomb Fluit generator	
+4620	Water splash	
+4625	Centipede (4625)	
+4631	Big Blue Blurp	
+4632	Spitted water	
+4638	Lakitu (melons)	
+4639		
+4647	'?' bubble (special heart)	
+464b		
+464c	Rock (special heart)	
+464d	Rock (White Shy Guy)	
+464f	Yellow rock	
+4653	'?' card	
+4655	falling '?' card	
+465e	Time attack melon 1	
+465f	Time attack melon 2	
+4660	Time attack melon 3	
+4661	Time attack melon 4	
+4662	Time attack melon 5	
+4663	Time attack melon 6	
+4664	Time attack melon 7	
+466a	Hidden surprise ball	
+466b	Hidden coin	
+466c	Hidden special heart	
+466e	Hidden cloud (large)	
+466f	Hidden cloud (medium)	
+4670	Hidden cloud (small)	
+4673		
+4677	Centipede (4677)	
+4678	Centipede (4678)	
+4679	Centipede (4679)	
+4684	'?' block (time attack)	
+4686	Sunflower	
+4689	Buried special heart	
+468a	Hidden platform	
+468b	Buried heart fluit	
+468d	'?' bubble ('!' switch)	
+4690	'?' bubble (Shy Guy)	
+4694	'?' bubble (Heart Coin)	
+4698	Shy Guy (lucky fluit)	
+4699	'?' block (long jump game)	
+469b	'?' box (empty)	
+46a0	Line guided bouncing ball 1	
+46a1	Line guided bouncing ball 2	
+46a2	Line guided bouncing ball 3	
+46a3	Line guided bouncing ball 4	
+46a4	Line guided bouncing ball 5	
+46a8	Bubble (lucky fluit)	
+46a9	'?' bubble (vase)	
+46aa	'?' bubble (White Shy Guy)	
+46ac	Moving '?' bubble (melon)	
+46ad	Moving '?' bubble (special heart)	
+46af	Piece of '?' box	
+46b4	'?' box (melon)	
+46b8	'?' box (White Shy Guy)	
+46bb		
+46bc		
+46bd		
+46be		
+46bf		
+46c0		
+46c1		
+46c2		
+46c3		
+46c4		
+46c5		
+46c6		
+46c7		
+46c8		
+46c9		
+46ca		
+46cb		
+46cc		
+46cd		
+46ce		
+46cf		
+46d0		
+46d1		
+46d2		
+46d3		
+46d4	Line guided melon 1	
+46d5	Line guided melon 2	
+46df	Shy Guy (6df)	
+46e0	Shy Guy (6e0)	
+46ee		
+46f4	Zzz	
+46f5	Controlpoint	
+46fb	Arrow sign (right)	
+46fc		
+46fe	Arrow sign (left)	
+4700	Arrow sign (left, top)	
+4701	Arrow sign (up, right)	
+4702	Arrow sign (up, left)	
+4703	Arrow sign (down, right)	
+4704	Arrow sign (down, left)	
+4705	Goonie generator	
+470a		
+470e		
+4719	Start flag (melon boxes game)	
+472a	Poochy (stop)	
+4732	Buried coins	
+4733	Time attack Chomp	
+4734		
+4739		
