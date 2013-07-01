@@ -72,11 +72,18 @@ namespace YSedit
             }
         }
 
+        public void editPreparedList()
+        {
+            var form = new EditPreparedList();
+            form.ShowDialog();
+        }
+
         public string getMapInformationStr()
         {
             string s = "";
             s += "Map number: " + currentMapNumber.ToString("x2") + "\n";
             s += "objPlaces: " + rom.dataIDToRomAddress(placeVector.getDataID(romIF.placeVector_iObjPlaces)).ToString() + "\n";
+            s += "preparedList: " + (rom.dataIDToRomAddress(ustruct5.getDataID(romIF.uttruct5_iUStruct3)) + romIF.ustruct3_preparedList).ToString() + "\n";
             return s;
         }
     }

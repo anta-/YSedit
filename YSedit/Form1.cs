@@ -236,5 +236,10 @@ namespace YSedit
             if (rom != null)
                 rom.saveToROM();
         }
+
+        private void editPreparedListToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            rom.map.editPreparedList();
+        }
     }
 }

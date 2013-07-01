@@ -26,6 +26,9 @@ namespace YSedit
 
         public readonly uint ustruct3_size;
         public readonly uint ustruct3_iiPlaceVector;
+        public readonly uint ustruct3_preparedList;
+        public readonly uint preparedList_count;
+
         public readonly uint placeVector_size;
         public readonly uint placeVector_numberOfObjPlaces;
         public readonly uint placeVector_iObjPlaces;
@@ -60,6 +63,9 @@ namespace YSedit
 
             ustruct3_size = 0x118;
             ustruct3_iiPlaceVector = 0x5c;
+            ustruct3_preparedList = 0x60;
+            preparedList_count = 0x50;
+
             placeVector_size = 8;
             placeVector_numberOfObjPlaces = 0;
             placeVector_iObjPlaces = 4;

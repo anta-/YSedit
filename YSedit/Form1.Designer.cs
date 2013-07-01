@@ -40,7 +40,6 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.editUStruct3ManualyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.addObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editObjectListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.change8xxxObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -51,12 +50,13 @@
             this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.visualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.collisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.utilToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.autmaticSetKindListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.infoStatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainViewPanel = new System.Windows.Forms.Panel();
+            this.editPreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resolvePreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -67,7 +67,7 @@
             this.fileToolStripMenuItem,
             this.mapEditToolStripMenuItem,
             this.viewToolStripMenuItem,
-            this.utilToolStripMenuItem});
+            this.optionsToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(384, 24);
@@ -122,8 +122,8 @@
             this.toolStripSeparator1,
             this.editUStruct3ManualyToolStripMenuItem,
             this.toolStripSeparator2,
-            this.addObjectToolStripMenuItem,
             this.editObjectListToolStripMenuItem,
+            this.editPreparedListToolStripMenuItem,
             this.toolStripSeparator3,
             this.change8xxxObjectToolStripMenuItem,
             this.editBlocksInfoToolStripMenuItem});
@@ -161,13 +161,6 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(204, 6);
-            // 
-            // addObjectToolStripMenuItem
-            // 
-            this.addObjectToolStripMenuItem.Enabled = false;
-            this.addObjectToolStripMenuItem.Name = "addObjectToolStripMenuItem";
-            this.addObjectToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.addObjectToolStripMenuItem.Text = "&Add Object...";
             // 
             // editObjectListToolStripMenuItem
             // 
@@ -247,24 +240,6 @@
             this.collisionToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.collisionToolStripMenuItem.Text = "Block &Collision";
             // 
-            // utilToolStripMenuItem
-            // 
-            this.utilToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.autmaticSetKindListToolStripMenuItem});
-            this.utilToolStripMenuItem.Name = "utilToolStripMenuItem";
-            this.utilToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
-            this.utilToolStripMenuItem.Text = "&Option";
-            // 
-            // autmaticSetKindListToolStripMenuItem
-            // 
-            this.autmaticSetKindListToolStripMenuItem.Checked = true;
-            this.autmaticSetKindListToolStripMenuItem.CheckOnClick = true;
-            this.autmaticSetKindListToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.autmaticSetKindListToolStripMenuItem.Enabled = false;
-            this.autmaticSetKindListToolStripMenuItem.Name = "autmaticSetKindListToolStripMenuItem";
-            this.autmaticSetKindListToolStripMenuItem.Size = new System.Drawing.Size(205, 22);
-            this.autmaticSetKindListToolStripMenuItem.Text = "&Autmatic Setting Kind List";
-            // 
             // openROMFileDialog
             // 
             this.openROMFileDialog.Filter = "ROM files|*.z64|All files|*.*";
@@ -296,6 +271,30 @@
             this.mainViewPanel.Name = "mainViewPanel";
             this.mainViewPanel.Size = new System.Drawing.Size(384, 286);
             this.mainViewPanel.TabIndex = 3;
+            // 
+            // editPreparedListToolStripMenuItem
+            // 
+            this.editPreparedListToolStripMenuItem.Name = "editPreparedListToolStripMenuItem";
+            this.editPreparedListToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.editPreparedListToolStripMenuItem.Text = "Edit &Prepared List...";
+            this.editPreparedListToolStripMenuItem.Click += new System.EventHandler(this.editPreparedListToolStripMenuItem_Click);
+            // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resolvePreparedListToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.optionsToolStripMenuItem.Text = "&Option";
+            // 
+            // resolvePreparedListToolStripMenuItem
+            // 
+            this.resolvePreparedListToolStripMenuItem.Checked = true;
+            this.resolvePreparedListToolStripMenuItem.CheckOnClick = true;
+            this.resolvePreparedListToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.resolvePreparedListToolStripMenuItem.Name = "resolvePreparedListToolStripMenuItem";
+            this.resolvePreparedListToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.resolvePreparedListToolStripMenuItem.Text = "&Resolve Prepared List";
             // 
             // Form1
             // 
@@ -330,7 +329,6 @@
         private System.Windows.Forms.ToolStripMenuItem editObjectModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem addObjectToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editUStruct3ManualyToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
@@ -340,16 +338,17 @@
         private System.Windows.Forms.ToolStripMenuItem objectsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem visualToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem collisionToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem utilToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openROMFileDialog;
         private System.Windows.Forms.ToolStripMenuItem closeROMToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem editObjectListToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem autmaticSetKindListToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         public System.Windows.Forms.ToolStripStatusLabel infoStatusText;
         private System.Windows.Forms.ToolStripMenuItem mapInformationToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.Panel mainViewPanel;
+        private System.Windows.Forms.ToolStripMenuItem editPreparedListToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resolvePreparedListToolStripMenuItem;
     }
 }
 

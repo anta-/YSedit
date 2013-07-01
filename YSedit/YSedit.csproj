@@ -75,6 +75,12 @@
     <Compile Include="EditObjectList.Designer.cs">
       <DependentUpon>EditObjectList.cs</DependentUpon>
     </Compile>
+    <Compile Include="EditPreparedList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditPreparedList.Designer.cs">
+      <DependentUpon>EditPreparedList.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -98,6 +104,9 @@
     <Compile Include="Util.cs" />
     <EmbeddedResource Include="EditObjectList.resx">
       <DependentUpon>EditObjectList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EditPreparedList.resx">
+      <DependentUpon>EditPreparedList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>

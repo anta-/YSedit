@@ -24,6 +24,22 @@ namespace YSedit
 
             public Case c;
             public uint a;
+
+            public static Dependent ObjCfg(uint kind)
+            {
+                Dependent d = new Dependent();
+                d.c = Case.ObjCfg;
+                d.a = kind;
+                return d;
+            }
+
+            public static Dependent ObjFunc(uint addr)
+            {
+                Dependent d = new Dependent();
+                d.c = Case.ObjFunc;
+                d.a = addr;
+                return d;
+            }
         }
 
         class Info
