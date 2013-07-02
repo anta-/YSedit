@@ -40,7 +40,7 @@ namespace YSedit
             c.DisplayMember = "Name";
             knownObjs = new HashSet<uint>(objNames.Select(x => x.kind));
 
-            uint objs = (uint)firstObjPlaces.bytes.Length / romIF.objPlaceC_size;
+            uint objs = (uint)firstObjPlaces.Length / romIF.objPlaceC_size;
 
             for (var i = 0; i < objs; i++)
             {

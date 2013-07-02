@@ -21,8 +21,10 @@ namespace YSedit
         {
             InitializeComponent();
 
+            Program.option.registerBooleanMenuItem(resolvePreparedListToolStripMenuItem, "resolvePreparedList");
             setInfoStatusText("");
             setROMOpend(false);
+            
         }
 
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)

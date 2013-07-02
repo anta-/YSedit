@@ -187,7 +187,7 @@ namespace YSedit
         /// <exception cref="NeedExpansionException">ROM容量が足りない時</exception>
         RomAddress newExData(Data data)
         {
-            var size = 0xc + data.bytes.Length;
+            var size = 0xc + data.Length;
             var last = yseditInfo.exSpaceAddr + yseditInfo.exSpaceSize;
 
             RomAddress a = yseditInfo.exSpaceAddr;
@@ -221,7 +221,7 @@ namespace YSedit
             dataHeader.setWord(4, next.x);
             if (next.x != last)
                 writeWord(next + 0, a.x);
-            dataHeader.setWord(8, (uint)data.bytes.Length);
+            dataHeader.setWord(8, (uint)data.Length);
             writeData(a, dataHeader);
             writeData(a + 0xc, data);
             return a + 0xc;
@@ -288,7 +288,15 @@ namespace YSedit
                 modInstall = true;
             }
 
-            saveObjPlaces();
+            try
+            {
+                saveMapInfos();
+            }
+            catch (Map.CannotSaveException e)
+            {
+                MessageBox.Show("Not correctly saved: " + e.Message, "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
 
             saveYSeditInfo(yseditInfo);
             yseditInfo = null;
@@ -345,14 +353,16 @@ namespace YSedit
             return info;
         }
 
-        void saveObjPlaces()
+        void saveMapInfos()
         {
             var objPlaces = map.getObjPlaces();
-            var numberOfObjects = objPlaces.bytes.Length / romIF.objPlaceC_size;
+            var numberOfObjects = objPlaces.Length / romIF.objPlaceC_size;
+            var ustruct3 = map.getUStruct3();
 
             var ustruct5 = readData(romIF.ustruct5Table + map.currentMapNumber * romIF.ustruct5_size, romIF.ustruct5_size);
             var iUStruct3 = ustruct5.getDataID(romIF.uttruct5_iUStruct3);
-            var ustruct3 = readData(iUStruct3, romIF.ustruct3_size);
+            writeData(iUStruct3, ustruct3);
+
             var iiPlaceVector = ustruct3.getDataID(romIF.ustruct3_iiPlaceVector);
             var iPlaceVector = readData(iiPlaceVector, 4).getDataID(0);
             var placeVector = readData(iPlaceVector, romIF.placeVector_size);
@@ -413,7 +423,7 @@ namespace YSedit
         void writeData(RomAddress addr, Data data)
         {
             romFile.Seek(addr.x, SeekOrigin.Begin);
-            romFile.Write(data.bytes, 0, data.bytes.Length);
+            romFile.Write(data.bytes, 0, data.Length);
         }
 
         /// <summary>

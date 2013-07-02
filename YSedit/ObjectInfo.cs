@@ -14,7 +14,7 @@ namespace YSedit
             Count
         }
 
-        class Dependent
+        public class Dependent
         {
             public enum Case
             {
@@ -47,6 +47,7 @@ namespace YSedit
             public bool canPlace;
             public string[] names, descriptions;
             public List<Dependent> dependents;
+            public List<uint> funcs;
 
             public Info()
             {
@@ -54,10 +55,12 @@ namespace YSedit
                 names = Enumerable.Repeat("", (int)Language.Count).ToArray();
                 descriptions = Enumerable.Repeat("", (int)Language.Count).ToArray();
                 dependents = new List<Dependent>();
+                funcs = new List<uint>();
             }
         }
 
         static Info[] infos;
+        static Dictionary<uint, List<ushort>> funcMap = new Dictionary<uint,List<ushort>>();
 
         const string directory = "ObjectInfo/";
         static public void init()
@@ -67,60 +70,94 @@ namespace YSedit
             loadCanPlace();
             loadObjectName(Language.Japanese, "ja");
             loadObjectName(Language.English, "en");
+            loadObjectDependents();
+            loadObjectFuncs();
         }
 
-        static string[] getLines(string s)
+        static string[] getLines(string path)
         {
-            return s.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            using (var f = new StreamReader(path)) {
+                return f.ReadToEnd().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            }
         }
 
         static void loadAllObjects()
         {
-            using (var f = new StreamReader(directory + "AllObjects.txt"))
-            {
-                var a = getLines(f.ReadToEnd());
-                foreach (var x in a)
-                    infos[x.parseHex(0xffff)] = new Info();
-            }
+            var a = getLines(directory + "AllObjects.txt");
+            foreach (var x in a)
+                infos[x.parseHex(0xffff)] = new Info();
         }
 
         static void loadCanPlace()
         {
-            using (var f = new StreamReader(directory + "CanPlaceObjects.txt"))
-            {
-                var a = getLines(f.ReadToEnd());
-                foreach (var x in a)
-                    infos[x.parseHex(0xffff)].canPlace = true;
-            }
+            var a = getLines(directory + "CanPlaceObjects.txt");
+            foreach (var x in a)
+                infos[x.parseHex(0xffff)].canPlace = true;
         }
 
         static void loadObjectName(Language lang, string suf)
         {
-            using (var f = new StreamReader(directory + "ObjectName_" + suf + ".txt"))
+            var a = getLines(directory + "ObjectName_" + suf + ".txt");
+            foreach (var line in a)
             {
-                var a = getLines(f.ReadToEnd());
-                foreach (var line in a)
+                var t = line.Split('\t');
+                var u = t[0].Split(new string[] { ".." }, StringSplitOptions.None);
+                uint lower, upper;
+                if (u.Length == 1)
+                    lower = upper = t[0].parseHex(0xffff);
+                else if (u.Length == 2)
                 {
-                    var t = line.Split('\t');
-                    var u = t[0].Split(new string[] { ".." }, StringSplitOptions.None);
-                    uint lower, upper;
-                    if (u.Length == 1)
-                        lower = upper = t[0].parseHex(0xffff);
-                    else if (u.Length == 2)
-                    {
-                        lower = u[0].parseHex(0xffff);
-                        upper = u[1].parseHex(0xffff);
-                    }
-                    else throw new Exception();
-                    if (lower > upper) throw new Exception();
+                    lower = u[0].parseHex(0xffff);
+                    upper = u[1].parseHex(0xffff);
+                }
+                else throw new Exception();
+                if (lower > upper) throw new Exception();
 
-                    for (var kind = lower; kind <= upper; kind++)
-                        if (infos[kind] != null)
-                        {
-                            infos[kind].names[(int)lang] =
-                                lower == upper ? t[1] : t[1] + " " + kind.ToString("x4");
-                            infos[kind].descriptions[(int)lang] = t[2];
-                        }
+                for (var kind = lower; kind <= upper; kind++)
+                    if (infos[kind] != null)
+                    {
+                        infos[kind].names[(int)lang] =
+                            lower == upper ? t[1] : t[1] + " " + kind.ToString("x4");
+                        infos[kind].descriptions[(int)lang] = t[2];
+                    }
+            }
+        }
+
+        static void loadObjectDependents()
+        {
+            var a = getLines(directory + "ObjectDependents.txt");
+            foreach (var line in a)
+            {
+                var t = line.Split('\t');
+                var kind = t[0].parseHex(0xffff);
+                var deps = t[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                foreach (var dep in deps)
+                {
+                    if (dep[0] == '!')
+                        infos[kind].dependents.Add(
+                            Dependent.ObjFunc(dep.Substring(1).parseHex()));
+                    else
+                        infos[kind].dependents.Add(
+                            Dependent.ObjCfg(dep.parseHex(0xffff)));
+                }
+            }
+        }
+
+        static void loadObjectFuncs()
+        {
+            var a = getLines(directory + "ObjectFuncs.txt");
+            foreach (var line in a)
+            {
+                var t = line.Split('\t');
+                var kind = t[0].parseHex(0xffff);
+                var funcs = t[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());
+                foreach (var func in funcs)
+                {
+                    var f = func.parseHex();
+                    infos[kind].funcs.Add(f);
+                    if (!funcMap.ContainsKey(f))
+                        funcMap[f] = new List<ushort>();
+                    funcMap[f].Add((ushort)kind);
                 }
             }
         }
@@ -177,6 +214,30 @@ namespace YSedit
             }
 
             return r;
+        }
+
+        public static List<Dependent> getObjectDependents(ushort kind)
+        {
+            if (infos[kind] == null)
+                return new List<Dependent>();
+            else
+                return infos[kind].dependents;
+        }
+
+        public static List<uint> getObjectFuncs(ushort kind)
+        {
+            if (infos[kind] == null)
+                return new List<uint>();
+            else
+                return infos[kind].funcs;
+        }
+
+        public static List<ushort> getFuncObjects(uint f)
+        {
+            if (!funcMap.ContainsKey(f))
+                return new List<ushort>();
+            else
+                return funcMap[f];
         }
     }
 }

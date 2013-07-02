@@ -21,9 +21,42 @@ namespace YSedit
         Data ustruct5;
         Data ustruct3;
         Data placeVector;
+
+        public class CannotSaveException : ApplicationException
+        {
+            public CannotSaveException(string msg): base(msg) {}
+        }
+
         public Data getObjPlaces()
         {
             return mainView.getObjPlaces();
+        }
+
+        EditPreparedList newEditPreparedList()
+        {
+            return new EditPreparedList(romIF,
+                (bool)Program.option["resolvePreparedList"],
+                getObjPlaces(),
+                ustruct3.getData(romIF.ustruct3_preparedList, romIF.preparedList_count * 2));
+        }
+
+        public Data getUStruct3()
+        {
+            using (var form = newEditPreparedList())
+            {
+                try
+                {
+                    ustruct3.setData(romIF.ustruct3_preparedList, form.saveData());
+                }
+                catch (EditPreparedList.ChangeNothing)
+                {
+                }
+                catch (EditPreparedList.IDsTooMany)
+                {
+                    throw new CannotSaveException("Resolved prepared IDs is too many. please edit prepared list manually.");
+                }
+                return ustruct3;
+            }
         }
 
         /// <summary>
@@ -74,8 +107,12 @@ namespace YSedit
 
         public void editPreparedList()
         {
-            var form = new EditPreparedList();
-            form.ShowDialog();
+            var form = newEditPreparedList();
+            if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                rom.newChange(true);
+                ustruct3.setData(romIF.ustruct3_preparedList, form.resultData);
+            }
         }
 
         public string getMapInformationStr()

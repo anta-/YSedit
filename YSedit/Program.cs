@@ -10,6 +10,7 @@ namespace YSedit
     {
 
         static public Form1 form;
+        static public Option option = new Option();
 
         /// <summary>
         /// アプリケーションのメイン エントリ ポイントです。

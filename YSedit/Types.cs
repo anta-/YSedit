@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace YSedit
 {
@@ -114,6 +115,10 @@ namespace YSedit
     class Data
     {
         public byte[] bytes;
+        public int Length
+        {
+            get { return bytes.Length; }
+        }
 
         public Data(byte[] bytes_)
         {
@@ -167,6 +172,17 @@ namespace YSedit
         public void setRomAddress(uint offset, RomAddress val) { setWord(offset, val.x); }
         public DataID getDataID(uint offset) { return new DataID(getWord(offset)); }
         public void setDataID(uint offset, DataID val) { setWord(offset, val.x); }
+
+        public Data getData(uint offset, uint size)
+        {
+            Debug.Assert(offset + size <= Length);
+            return new Data(new List<byte>(bytes).GetRange((int)offset, (int)size).ToArray());
+        }
+        public void setData(uint offset, Data data)
+        {
+            Debug.Assert(offset + data.Length <= Length);
+            data.bytes.CopyTo(bytes, offset);
+        }
     }
 
     
