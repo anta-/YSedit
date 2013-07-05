@@ -128,6 +128,7 @@ namespace YSedit
             var a = getLines(directory + "ObjectDependents.txt");
             foreach (var line in a)
             {
+                if (line.Trim() == "") continue;
                 var t = line.Split('\t');
                 var kind = t[0].parseHex(0xffff);
                 var deps = t[1].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim());

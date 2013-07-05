@@ -85,7 +85,7 @@ local g_current_obj = 0
 local g_eggblock_f = false
 local g_posx, g_posy = 0, 0
 local g_current_deps = {}
-local g_current_deps_a = {}
+local g_current_ok_objsf = {}
 
 memory.pcbreak(0x8006bed4, function()
 --	print("deps")
@@ -125,6 +125,19 @@ memory.pcbreak(0x8004feac, function(pc)
 	if v0 == 0 then
 		print(string.format("NULL: %04x", g_a0))
 		g_objatt_null = true
+	end
+end)
+
+local g_genkind, g_gen_null = 0, false
+memory.pcbreak(0x80045790, function()
+	if not g_gen_null then
+	local a1 = memory.reg("a1")
+	local kind = BITS(a1, 0x10, 0x10)
+	if not g_current_ok_objsf[kind] then
+		print(string.format("generate: %04x", kind))
+		g_gen_null = true
+		g_genkind = kind
+	end
 	end
 end)
 
@@ -215,22 +228,55 @@ emu.frameadvance()
 
 print("start!")
 
-local startkind = 0x4502
-local f = io.open([[C:\test\game\64\data\ys_object_deps.txt]], startkind and "a" or "w")
-local treef = io.open([[C:\test\game\64\data\ys_object_tree.txt]], startkind and "a" or "w")
-local commentf = io.open([[C:\test\game\64\data\ys_object_comment.txt]], startkind and "a" or "w")
+local requireobjsf = {}
+
+for line in io.lines([[C:\test\game\64\data\ys_object_comment.txt]]) do
+	local kind = string.match(line, "^([0-9a-f]+)")
+	if kind then
+		requireobjsf[tonumber(kind, 16)] = true
+	end
+end
+
+for line in io.lines([[C:\test\game\64\data\ys_object_tree.txt]]) do
+	for parent, child in string.gmatch(line, "([0-9a-f]+)->([0-9a-f]+)") do
+		if parent ~= "NULL" then
+			requireobjsf[tonumber(child, 16)] = false
+		end
+	end
+end
+requireobjsf[0x4507] = true
+requireobjsf[0x4508] = true
+requireobjsf[0x4509] = true
+requireobjsf[0x450a] = true
+requireobjsf[0x4526] = true
+requireobjsf[0x4528] = true
+requireobjsf[0x456d] = true
+
+
+local requireobjs = 0
+for k, b in pairs(requireobjsf) do
+	if b then requireobjs = requireobjs + 1 end
+end
+print("requireobjs: " .. requireobjs)
+
+local startkind = 0x4546
+local f = io.open([[C:\test\game\64\data\ys_object_deps2.txt]], startkind and "a" or "w")
+local treef = io.open([[C:\test\game\64\data\ys_object_tree2.txt]], startkind and "a" or "w")
+local commentf = io.open([[C:\test\game\64\data\ys_object_comment2.txt]], startkind and "a" or "w")
 ::restart::
 emu.frameadvance()
 local a = {}
 local prevkind = 0
-for i, kind in ipairs(ks) do if not startkind or kind >= startkind then
+for i, kind in ipairs(ks) do
+if (not startkind or kind >= startkind) and requireobjsf[kind] then
 	g_current_obj = kind
 	g_current_deps = {0x4001,0x4002,0x4003,0x4004,0x4005,0x4006,0x4007,0x4008,0x4009,0x400a,0x400b,0x400c,0x400d,0x400e,0x400f,0x4010,0x4011,0x4012,0x4013,0x4014,0x4015,0x4016,0x4017,0x4018,0x4019,0x401a,0x401b,0x401c,0x401d,0x401e,0x401f,0x4020,0x4021,0x4022,0x4023,0x4024,0x4025,0x4026,0x4027,0x402c,0x4030,0x4031,0x4032,0x4033,0x4034,0x4035,0x4088,0x40f2,0x460c,0x460d, 0x4739}
+	g_current_ok_objsf = {}
+	g_current_ok_objsf[kind] = true
 	for _, o in ipairs(g_current_deps) do
-		g_current_deps_a[o] = true
+		g_current_ok_objsf[o] = true
 	end
 	g_current_depfuncs = {}
-	g_current_deps_a = {}
 	g_eggblock_f = false
 	g_tree = {}
 	g_posx = 0x98
@@ -245,6 +291,7 @@ for i, kind in ipairs(ks) do if not startkind or kind >= startkind then
 		savestate.loadfile(initsavename)
 		g_framecount = 0
 		g_objatt_null = false
+		g_gen_null = false
 		null_func_addr = nil
 		ok = true
 
@@ -299,21 +346,28 @@ for i, kind in ipairs(ks) do if not startkind or kind >= startkind then
 			
 			if g_objatt_null then
 				table.insert(g_current_deps, g_a0)
-				g_current_deps_a[g_a0] = true
+				g_current_ok_objsf[g_a0] = true
 				ok = false
+				break
+			end
+			if g_gen_null then
+				table.insert(g_current_deps, g_genkind)
+				g_current_ok_objsf[g_genkind] = true
+				ok = false
+				print(string.format("add %04x", g_genkind))
 				break
 			end
 			if null_func_addr then
 				local k = g_addrsa[null_func_addr]
-				if g_current_deps_a[k] then
-					print(string.format("g_current_deps_a[g_addra[%08x]]", null_func_addr))
+				if g_current_ok_objsf[k] then
+					print(string.format("g_current_ok_objsf[g_addra[%08x]]", null_func_addr))
 					commentf:write(string.format("%04x: freeze?\n", kind))
 					commentf:flush()
 					ok = true
 					break
 				end
 				table.insert(g_current_deps, k)
-				g_current_deps_a[k] = true
+				g_current_ok_objsf[k] = true
 				g_current_depfuncs[k] = null_func_addr
 				ok = false
 				break
@@ -372,7 +426,7 @@ emu.atvi(function()
 	g_pinp = g_inp
 	g_inp = input.get()
 	g_dinp = input.diff(g_inp, g_pinp)
-    wgui.text(240, 220, string.format("%04x:%d", g_current_obj, g_framecount))
+    wgui.text(480, 440, string.format("%04x:%d", g_current_obj, g_framecount))
     if main_wrap and not main_wrap() then
             main_wrap = nil
     end
