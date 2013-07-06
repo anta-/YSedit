@@ -243,5 +243,10 @@ namespace YSedit
         {
             rom.map.editPreparedList();
         }
+
+        private void reloadObjectInfoFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ObjectInfo.init();
+        }
     }
 }

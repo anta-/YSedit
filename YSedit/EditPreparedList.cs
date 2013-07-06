@@ -13,8 +13,9 @@ namespace YSedit
     partial class EditPreparedList : Form
     {
         ROMInterface romIF;
-        List<ushort> oldIDs, resolved, additional;
+        List<ushort> oldIDs, resolved, newResolved, additional;
         public Data resultData;
+        string infoText = "";
 
         public EditPreparedList(ROMInterface romIF, bool resolve, Data objPlaces, Data data)
         {
@@ -26,6 +27,8 @@ namespace YSedit
 
             setText(additionalIDs, additional);
             setText(resolvedIDs, resolved);
+            setText(newResolvedIDs, newResolved);
+            information.Text = infoText.Replace("\n", "\r\n");
             resolvedIDs.Enabled = resolve;
         }
 
@@ -41,7 +44,8 @@ namespace YSedit
             oldIDs = ids.OrderBy(x => x).ToList();
 
             HashSet<ushort> t = r ? resolve(ids, objPlaces) : new HashSet<ushort>();
-            resolved = t.ToList();
+            newResolved = t.Except(ids).ToList();
+            resolved = t.Except(newResolved).ToList();
             additional = ids.Except(t).ToList();
         }
 
@@ -49,15 +53,16 @@ namespace YSedit
         {
             HashSet<ushort> s = new HashSet<ushort>();
 
-            Action<ushort> addObject = (ushort k) =>
+            Action<ushort,string> addObject = (ushort k, string info) =>
             {
                 if (s.Contains(k))
                     return;
+                infoText += info + " -> " + k.ToString("x4") + "\n";
                 s.Add(k);
             };
 
             foreach (var k in romIF.basicObjects)
-                addObject(k);
+                addObject(k, "basic");
 
             int numberOfObjs = (int)(objPlaces.Length / romIF.objPlaceC_size);
             for (uint i = 0; i < numberOfObjs; i++)
@@ -68,22 +73,22 @@ namespace YSedit
                     switch (dep.c)
                     {
                         case ObjectInfo.Dependent.Case.ObjCfg:
-                            addObject((ushort)dep.a);
+                            addObject((ushort)dep.a, "#" + kind.ToString("x4"));
                             break;
                         case ObjectInfo.Dependent.Case.ObjFunc:
                             var ks = ObjectInfo.getFuncObjects(dep.a);
                             if (ks.Count == 0)
                             {
                                 //どうしようもない
-                                Debug.Print("ObjFunc {0:x8}", dep.a);
+                                infoText += "!" + kind.ToString("x4") + "->" + dep.a.ToString("x8") + "\n";
                                 break;
                             }
                             if (!ks.Any(k => s.Contains(k)))
                             {
                                 if (ks.Any(k => ids.Contains(k)))
-                                    addObject(ks.Find(k => ids.Contains(k)));
+                                    addObject(ks.Find(k => ids.Contains(k)), "%" + kind.ToString("x4"));
                                 else 
-                                    addObject(ks[0]);
+                                    addObject(ks[0], "$" + kind.ToString("x4"));
                             }
                             break;
                     }
@@ -93,7 +98,8 @@ namespace YSedit
             for (uint i = 0; i < numberOfObjs; i++)
             {
                 var kind = objPlaces.getHalf(i * romIF.objPlaceC_size + romIF.objPlace_kind);
-                s.Remove(kind);
+                if (s.Remove(kind))
+                    infoText += kind.ToString("x4") + " remove" + "\n";
             }
 
             return s;
@@ -101,11 +107,12 @@ namespace YSedit
 
         void setText(TextBox t, List<ushort> l)
         {
-            t.Text = String.Join(", ", l.Select(x => x.ToString("x4")));
+            t.Text = String.Join(", ", l.OrderBy(x => x).Select(x => x.ToString("x4")));
         }
 
         ushort[] getText(TextBox t)
         {
+            if (t.Text.Trim() == "") return new ushort[]{};
             return t.Text.Split(',').Select(x => (ushort)x.Trim().parseHex(0xffff)).ToArray();
         }
 
@@ -124,7 +131,9 @@ namespace YSedit
         public Data saveData()
         {
             ushort[] IDs =
-                getText(resolvedIDs)
+                Enumerable.Empty<ushort>()
+                .Union(getText(resolvedIDs))
+                .Union(getText(newResolvedIDs))
                 .Union(getText(additionalIDs))
                 .OrderBy(x => x)
                 .ToArray();
@@ -167,11 +176,6 @@ namespace YSedit
         {
             DialogResult = DialogResult.Cancel;
             Close();
-        }
-
-        private void EditPreparedList_FormClosing(object sender, FormClosingEventArgs e)
-        {
-
         }
     }
 }

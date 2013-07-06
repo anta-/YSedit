@@ -60,24 +60,30 @@ namespace YSedit
         }
 
         static Info[] infos;
-        static Dictionary<uint, List<ushort>> funcMap = new Dictionary<uint,List<ushort>>();
+        static Dictionary<uint, List<ushort>> funcMap;
 
-        const string directory = "ObjectInfo/";
+        const string directory = "ObjectInfo/"; //@"C:\Documents and Settings\test\My Documents\Visual Studio 2010\Projects\YSedit\YSedit\ObjectInfo\";
         static public void init()
         {
             infos = new Info[0x10000];
+            funcMap = new Dictionary<uint, List<ushort>>();
+
             loadAllObjects();
             loadCanPlace();
             loadObjectName(Language.Japanese, "ja");
             loadObjectName(Language.English, "en");
             loadObjectDependents();
+            transitiveClosureObjectDependents();
             loadObjectFuncs();
         }
 
         static string[] getLines(string path)
         {
             using (var f = new StreamReader(path)) {
-                return f.ReadToEnd().Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+                return f
+                    .ReadToEnd()
+                    .Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(x => x[0] != '#').ToArray();
             }
         }
 
@@ -161,6 +167,88 @@ namespace YSedit
                     funcMap[f].Add((ushort)kind);
                 }
             }
+        }
+
+        /// <summary>
+        /// あるオブジェクトに依存してるならそれが依存してるものに依存してるのは当たり前なので、推移閉包を取る
+        /// </summary>
+        //っと思ったけどそうでないもの
+        //(リフトさんの種は？シャボン全般の中身に用いられるが、その場合リフトさんには依存しない)
+        //が存在する…
+        //とりあえずハードコーディング？
+        static void transitiveClosureObjectDependents()
+        {
+            //Floyd-Warshall's のO(n^3)は掛かり過ぎるけど、
+            //この場合連結成分数が多いので、
+            //連結成分ごとに分解してからやればいいかな。
+            //'強'連結成分分解するヒューステリクスが有名かつ実用的なようだ。
+
+            Func<ushort,IEnumerable<ushort>> edges = (ushort i) =>
+                infos[i].dependents.SelectMany((Dependent d) => {
+                        switch(d.c) {
+                            case Dependent.Case.ObjCfg:
+                                return Enumerable.Repeat((ushort)d.a, 1);
+                            case Dependent.Case.ObjFunc:
+                                if (funcMap.ContainsKey(d.a) && funcMap[d.a].Count <= 1)
+                                    return funcMap[d.a];
+                                else
+                                    return Enumerable.Empty<ushort>();
+                            default:
+                                throw new Exception();
+                        }
+                    }
+                ).Where(j => infos[j] != null);
+            List<ushort>[] invedges = new List<ushort>[0x10000].Populate();
+            
+            for (var i = 0; i < 0x10000; i++)
+                if (infos[i] != null)
+                    foreach (var j in edges((ushort)i))
+                        invedges[j].Add((ushort)i);
+
+            bool[] visited = new bool[0x10000];
+            List<ushort> connected_component = new List<ushort>();
+            Action<ushort> dfs = null;
+            dfs = i =>
+            {
+                if (visited[i])
+                    return;
+                visited[i] = true;
+                connected_component.Add(i);
+                foreach (var j in edges(i))
+                    dfs(j);
+                foreach (var j in invedges[i])
+                    dfs(j);
+            };
+
+            int[] index = new int[0x10000];
+            for (int i = 0; i < 0x10000; i++)
+                if (infos[i] != null && !visited[i])
+                {
+                    connected_component.Clear();
+                    dfs((ushort)i);
+                    int size = connected_component.Count;
+                    bool[,]
+                        orggraph = new bool[size, size],
+                        graph = new bool[size, size];
+                    for (var v = 0; v < size; v++)
+                        index[connected_component[v]] = v;
+                    foreach (var v in connected_component)
+                        foreach (var u in edges(v))
+                        {
+                            int j = index[v], k = index[u];
+                            orggraph[j, k] = graph[j, k] = true;
+                        }
+                    for (var k = 0; k < size; k++)
+                        if (connected_component[k] != 0x41ce)   //リフトさんの種
+                            for (var v = 0; v < size; v++)
+                                for (var u = 0; u < size; u++)
+                                    graph[v, u] |= graph[v, k] && graph[k, u];
+                    for (var v = 0; v < size; v++)
+                        for (var u = 0; u < size; u++)
+                            if (graph[v, u] && !orggraph[v, u] && v != u)
+                                infos[connected_component[v]].dependents.Add(
+                                    Dependent.ObjCfg(connected_component[u]));
+                }
         }
 
         public class KindNameDesc

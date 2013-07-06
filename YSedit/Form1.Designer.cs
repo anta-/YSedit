@@ -41,6 +41,7 @@
             this.editUStruct3ManualyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.editObjectListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.editPreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.change8xxxObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editBlocksInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,13 +51,13 @@
             this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.visualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.collisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resolvePreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.infoStatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainViewPanel = new System.Windows.Forms.Panel();
-            this.editPreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resolvePreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reloadObjectInfoFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -80,7 +81,8 @@
             this.openROMToolStripMenuItem,
             this.closeROMToolStripMenuItem,
             this.openMapNumberToolStripMenuItem,
-            this.saveMapToolStripMenuItem});
+            this.saveMapToolStripMenuItem,
+            this.reloadObjectInfoFileToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(36, 20);
             this.fileToolStripMenuItem.Text = "&File";
@@ -88,21 +90,21 @@
             // openROMToolStripMenuItem
             // 
             this.openROMToolStripMenuItem.Name = "openROMToolStripMenuItem";
-            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.openROMToolStripMenuItem.Text = "&Open ROM...";
             this.openROMToolStripMenuItem.Click += new System.EventHandler(this.openROMToolStripMenuItem_Click);
             // 
             // closeROMToolStripMenuItem
             // 
             this.closeROMToolStripMenuItem.Name = "closeROMToolStripMenuItem";
-            this.closeROMToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.closeROMToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.closeROMToolStripMenuItem.Text = "&Close ROM";
             this.closeROMToolStripMenuItem.Click += new System.EventHandler(this.closeROMToolStripMenuItem_Click);
             // 
             // openMapNumberToolStripMenuItem
             // 
             this.openMapNumberToolStripMenuItem.Name = "openMapNumberToolStripMenuItem";
-            this.openMapNumberToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.openMapNumberToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.openMapNumberToolStripMenuItem.Text = "Open &Map Number...";
             this.openMapNumberToolStripMenuItem.Click += new System.EventHandler(this.openMapNumberToolStripMenuItem_Click);
             // 
@@ -110,7 +112,7 @@
             // 
             this.saveMapToolStripMenuItem.Enabled = false;
             this.saveMapToolStripMenuItem.Name = "saveMapToolStripMenuItem";
-            this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(170, 22);
+            this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
             this.saveMapToolStripMenuItem.Text = "&Save Map to ROM";
             this.saveMapToolStripMenuItem.Click += new System.EventHandler(this.saveMapToolStripMenuItem_Click);
             // 
@@ -168,6 +170,13 @@
             this.editObjectListToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
             this.editObjectListToolStripMenuItem.Text = "Edit Object &List...";
             this.editObjectListToolStripMenuItem.Click += new System.EventHandler(this.editObjectListToolStripMenuItem_Click);
+            // 
+            // editPreparedListToolStripMenuItem
+            // 
+            this.editPreparedListToolStripMenuItem.Name = "editPreparedListToolStripMenuItem";
+            this.editPreparedListToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
+            this.editPreparedListToolStripMenuItem.Text = "Edit &Prepared List...";
+            this.editPreparedListToolStripMenuItem.Click += new System.EventHandler(this.editPreparedListToolStripMenuItem_Click);
             // 
             // toolStripSeparator3
             // 
@@ -240,6 +249,23 @@
             this.collisionToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.collisionToolStripMenuItem.Text = "Block &Collision";
             // 
+            // optionsToolStripMenuItem
+            // 
+            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.resolvePreparedListToolStripMenuItem});
+            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
+            this.optionsToolStripMenuItem.Text = "&Option";
+            // 
+            // resolvePreparedListToolStripMenuItem
+            // 
+            this.resolvePreparedListToolStripMenuItem.Checked = true;
+            this.resolvePreparedListToolStripMenuItem.CheckOnClick = true;
+            this.resolvePreparedListToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.resolvePreparedListToolStripMenuItem.Name = "resolvePreparedListToolStripMenuItem";
+            this.resolvePreparedListToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.resolvePreparedListToolStripMenuItem.Text = "&Resolve Prepared List";
+            // 
             // openROMFileDialog
             // 
             this.openROMFileDialog.Filter = "ROM files|*.z64|All files|*.*";
@@ -272,29 +298,12 @@
             this.mainViewPanel.Size = new System.Drawing.Size(384, 286);
             this.mainViewPanel.TabIndex = 3;
             // 
-            // editPreparedListToolStripMenuItem
+            // reloadObjectInfoFileToolStripMenuItem
             // 
-            this.editPreparedListToolStripMenuItem.Name = "editPreparedListToolStripMenuItem";
-            this.editPreparedListToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.editPreparedListToolStripMenuItem.Text = "Edit &Prepared List...";
-            this.editPreparedListToolStripMenuItem.Click += new System.EventHandler(this.editPreparedListToolStripMenuItem_Click);
-            // 
-            // optionsToolStripMenuItem
-            // 
-            this.optionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.resolvePreparedListToolStripMenuItem});
-            this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(50, 20);
-            this.optionsToolStripMenuItem.Text = "&Option";
-            // 
-            // resolvePreparedListToolStripMenuItem
-            // 
-            this.resolvePreparedListToolStripMenuItem.Checked = true;
-            this.resolvePreparedListToolStripMenuItem.CheckOnClick = true;
-            this.resolvePreparedListToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.resolvePreparedListToolStripMenuItem.Name = "resolvePreparedListToolStripMenuItem";
-            this.resolvePreparedListToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.resolvePreparedListToolStripMenuItem.Text = "&Resolve Prepared List";
+            this.reloadObjectInfoFileToolStripMenuItem.Name = "reloadObjectInfoFileToolStripMenuItem";
+            this.reloadObjectInfoFileToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.reloadObjectInfoFileToolStripMenuItem.Text = "&Reload ObjectInfo Files";
+            this.reloadObjectInfoFileToolStripMenuItem.Click += new System.EventHandler(this.reloadObjectInfoFileToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -349,6 +358,7 @@
         private System.Windows.Forms.ToolStripMenuItem editPreparedListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resolvePreparedListToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reloadObjectInfoFileToolStripMenuItem;
     }
 }
 
