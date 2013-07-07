@@ -33,7 +33,7 @@
             this.objectGroupSelect = new System.Windows.Forms.ComboBox();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.splitContainer2 = new System.Windows.Forms.SplitContainer();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.objectDescription = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.objectImageView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -114,7 +114,7 @@
             // 
             // splitContainer2.Panel1
             // 
-            this.splitContainer2.Panel1.Controls.Add(this.textBox1);
+            this.splitContainer2.Panel1.Controls.Add(this.objectDescription);
             // 
             // splitContainer2.Panel2
             // 
@@ -126,16 +126,16 @@
             this.splitContainer2.SplitterWidth = 2;
             this.splitContainer2.TabIndex = 3;
             // 
-            // textBox1
+            // objectDescription
             // 
-            this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(0, 0);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ReadOnly = true;
-            this.textBox1.Size = new System.Drawing.Size(256, 79);
-            this.textBox1.TabIndex = 0;
+            this.objectDescription.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.objectDescription.Location = new System.Drawing.Point(0, 0);
+            this.objectDescription.Margin = new System.Windows.Forms.Padding(0);
+            this.objectDescription.Multiline = true;
+            this.objectDescription.Name = "objectDescription";
+            this.objectDescription.ReadOnly = true;
+            this.objectDescription.Size = new System.Drawing.Size(256, 79);
+            this.objectDescription.TabIndex = 0;
             // 
             // ObjectSelector
             // 
@@ -146,7 +146,6 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.Name = "ObjectSelector";
             this.Text = "ObjectSelector";
-            this.Resize += new System.EventHandler(this.ObjectSelector_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.objectImageView)).EndInit();
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
@@ -168,6 +167,6 @@
         private System.Windows.Forms.ComboBox objectGroupSelect;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.SplitContainer splitContainer2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox objectDescription;
     }
 }

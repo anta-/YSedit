@@ -40,12 +40,17 @@ namespace YSedit
 
             objectSelect.ValueMember = "Kind";
             objectSelect.DisplayMember = "String";
+            objectSelect.SelectedValueChanged += new EventHandler(objectSelect_SelectedValueChanged);
+
             loadObjectGroups();
         }
 
-        private void ObjectSelector_Resize(object sender, EventArgs e)
+        void objectSelect_SelectedValueChanged(object sender, EventArgs e)
         {
-            
+            var kind = (ushort)objectSelect.SelectedValue;
+            objectDescription.Text =
+                ObjectInfo.getObjectDescription(kind,
+                    ObjectInfo.Language.Japanese);
         }
 
         void loadObjectGroups()
