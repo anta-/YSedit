@@ -90,6 +90,12 @@
     <Compile Include="MainView.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="ObjectInfo.cs" />
+    <Compile Include="ObjectSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ObjectSelector.Designer.cs">
+      <DependentUpon>ObjectSelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="OpenMapNumber.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -111,6 +117,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ObjectSelector.resx">
+      <DependentUpon>ObjectSelector.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OpenMapNumber.resx">
       <DependentUpon>OpenMapNumber.cs</DependentUpon>
@@ -168,6 +177,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ObjectInfo\ObjectFuncs.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="ObjectInfo\ObjectGroups.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="ObjectInfo\ObjectName_en.txt">

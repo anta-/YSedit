@@ -59,8 +59,21 @@ namespace YSedit
             }
         }
 
+        public class ObjectGroup
+        {
+            public readonly string groupName;
+            public readonly List<ushort> objects;
+
+            public ObjectGroup(string g, List<ushort> o)
+            {
+                groupName = g;
+                objects = o;
+            }
+        }
+
         static Info[] infos;
         static Dictionary<uint, List<ushort>> funcMap;
+        public static List<ObjectGroup> objectGroups;
 
         const string directory = "ObjectInfo/"; //@"C:\Documents and Settings\test\My Documents\Visual Studio 2010\Projects\YSedit\YSedit\ObjectInfo\";
         static public void init()
@@ -75,6 +88,7 @@ namespace YSedit
             loadObjectDependents();
             transitiveClosureObjectDependents();
             loadObjectFuncs();
+            loadObjectGroups();
         }
 
         static string[] getLines(string path)
@@ -251,6 +265,38 @@ namespace YSedit
                 }
         }
 
+        static void loadObjectGroups()
+        {
+            var a = getLines(directory + "ObjectGroups.txt");
+            objectGroups = new List<ObjectGroup>();
+
+            string currentGroupName = null;
+            List<ushort> currentObjects = null;
+
+            Action endGroup = delegate
+            {
+                if (currentObjects == null)
+                    return;
+                objectGroups.Add(new ObjectGroup(currentGroupName, currentObjects));
+                currentObjects = currentObjects = null;
+            };
+
+            foreach (var line in a)
+            {
+                if (line[line.Length - 1] == ':')
+                {
+                    endGroup();
+                    currentGroupName = line.Substring(0, line.Length - 1);
+                    currentObjects = new List<ushort>();
+                }
+                else
+                {
+                    currentObjects.Add((ushort)line.parseHex(0xffff));
+                }
+            }
+            endGroup();
+        }
+
         public class KindNameDesc
         {
             public KindNameDesc(uint k, string n, string d)
@@ -313,7 +359,7 @@ namespace YSedit
                 return infos[kind].dependents;
         }
 
-        public static List<uint> getObjectFuncs(ushort kind)
+        public static List<uint> ObjectFuncs(ushort kind)
         {
             if (infos[kind] == null)
                 return new List<uint>();

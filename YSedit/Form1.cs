@@ -16,6 +16,7 @@ namespace YSedit
 
         ROM rom = null;
         MainView mainView = null;
+        ObjectSelector objectSelector = new ObjectSelector();
 
         public Form1()
         {
@@ -24,7 +25,7 @@ namespace YSedit
             Program.option.registerBooleanMenuItem(resolvePreparedListToolStripMenuItem, "resolvePreparedList");
             setInfoStatusText("");
             setROMOpend(false);
-            
+            objectSelectWindowMenuStrip.Checked = true;
         }
 
         private void openROMToolStripMenuItem_Click(object sender, EventArgs e)
@@ -247,6 +248,14 @@ namespace YSedit
         private void reloadObjectInfoFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ObjectInfo.init();
+        }
+
+        private void toolStripMenuItem1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (objectSelectWindowMenuStrip.Checked)
+                objectSelector.Show();
+            else
+                objectSelector.Hide();
         }
     }
 }

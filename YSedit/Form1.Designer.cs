@@ -34,6 +34,7 @@
             this.closeROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openMapNumberToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reloadObjectInfoFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapEditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editObjectModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -57,7 +58,8 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.infoStatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainViewPanel = new System.Windows.Forms.Panel();
-            this.reloadObjectInfoFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.objectSelectWindowMenuStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -90,21 +92,21 @@
             // openROMToolStripMenuItem
             // 
             this.openROMToolStripMenuItem.Name = "openROMToolStripMenuItem";
-            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.openROMToolStripMenuItem.Text = "&Open ROM...";
             this.openROMToolStripMenuItem.Click += new System.EventHandler(this.openROMToolStripMenuItem_Click);
             // 
             // closeROMToolStripMenuItem
             // 
             this.closeROMToolStripMenuItem.Name = "closeROMToolStripMenuItem";
-            this.closeROMToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.closeROMToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.closeROMToolStripMenuItem.Text = "&Close ROM";
             this.closeROMToolStripMenuItem.Click += new System.EventHandler(this.closeROMToolStripMenuItem_Click);
             // 
             // openMapNumberToolStripMenuItem
             // 
             this.openMapNumberToolStripMenuItem.Name = "openMapNumberToolStripMenuItem";
-            this.openMapNumberToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.openMapNumberToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.openMapNumberToolStripMenuItem.Text = "Open &Map Number...";
             this.openMapNumberToolStripMenuItem.Click += new System.EventHandler(this.openMapNumberToolStripMenuItem_Click);
             // 
@@ -112,13 +114,22 @@
             // 
             this.saveMapToolStripMenuItem.Enabled = false;
             this.saveMapToolStripMenuItem.Name = "saveMapToolStripMenuItem";
-            this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.saveMapToolStripMenuItem.Text = "&Save Map to ROM";
             this.saveMapToolStripMenuItem.Click += new System.EventHandler(this.saveMapToolStripMenuItem_Click);
+            // 
+            // reloadObjectInfoFileToolStripMenuItem
+            // 
+            this.reloadObjectInfoFileToolStripMenuItem.Name = "reloadObjectInfoFileToolStripMenuItem";
+            this.reloadObjectInfoFileToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.reloadObjectInfoFileToolStripMenuItem.Text = "&Reload ObjectInfo Files";
+            this.reloadObjectInfoFileToolStripMenuItem.Click += new System.EventHandler(this.reloadObjectInfoFileToolStripMenuItem_Click);
             // 
             // mapEditToolStripMenuItem
             // 
             this.mapEditToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.objectSelectWindowMenuStrip,
+            this.toolStripSeparator5,
             this.editObjectModeToolStripMenuItem,
             this.editToolStripMenuItem,
             this.toolStripSeparator1,
@@ -298,12 +309,18 @@
             this.mainViewPanel.Size = new System.Drawing.Size(384, 286);
             this.mainViewPanel.TabIndex = 3;
             // 
-            // reloadObjectInfoFileToolStripMenuItem
+            // toolStripSeparator5
             // 
-            this.reloadObjectInfoFileToolStripMenuItem.Name = "reloadObjectInfoFileToolStripMenuItem";
-            this.reloadObjectInfoFileToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.reloadObjectInfoFileToolStripMenuItem.Text = "&Reload ObjectInfo Files";
-            this.reloadObjectInfoFileToolStripMenuItem.Click += new System.EventHandler(this.reloadObjectInfoFileToolStripMenuItem_Click);
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(204, 6);
+            // 
+            // objectSelectWindowMenuStrip
+            // 
+            this.objectSelectWindowMenuStrip.CheckOnClick = true;
+            this.objectSelectWindowMenuStrip.Name = "objectSelectWindowMenuStrip";
+            this.objectSelectWindowMenuStrip.Size = new System.Drawing.Size(207, 22);
+            this.objectSelectWindowMenuStrip.Text = "Object &Select Window";
+            this.objectSelectWindowMenuStrip.CheckedChanged += new System.EventHandler(this.toolStripMenuItem1_CheckedChanged);
             // 
             // Form1
             // 
@@ -359,6 +376,8 @@
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resolvePreparedListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reloadObjectInfoFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem objectSelectWindowMenuStrip;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
     }
 }
 
