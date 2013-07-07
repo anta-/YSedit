@@ -47,19 +47,20 @@
             this.change8xxxObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editBlocksInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.mapInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.objectSelectWindowMenuStrip = new System.Windows.Forms.ToolStripMenuItem();
+            this.objectPlaceListWindowMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.objectsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.visualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.collisionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.visualToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.mapInformationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.resolvePreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openROMFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.infoStatusText = new System.Windows.Forms.ToolStripStatusLabel();
             this.mainViewPanel = new System.Windows.Forms.Panel();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            this.objectSelectWindowMenuStrip = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -128,8 +129,6 @@
             // mapEditToolStripMenuItem
             // 
             this.mapEditToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.objectSelectWindowMenuStrip,
-            this.toolStripSeparator5,
             this.editObjectModeToolStripMenuItem,
             this.editToolStripMenuItem,
             this.toolStripSeparator1,
@@ -211,26 +210,38 @@
             // viewToolStripMenuItem
             // 
             this.viewToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mapInformationToolStripMenuItem,
-            this.toolStripSeparator4,
+            this.objectSelectWindowMenuStrip,
+            this.objectPlaceListWindowMenuItem,
+            this.toolStripSeparator5,
             this.objectsToolStripMenuItem,
+            this.collisionToolStripMenuItem,
             this.visualToolStripMenuItem,
-            this.collisionToolStripMenuItem});
+            this.toolStripSeparator4,
+            this.mapInformationToolStripMenuItem});
             this.viewToolStripMenuItem.Name = "viewToolStripMenuItem";
             this.viewToolStripMenuItem.Size = new System.Drawing.Size(42, 20);
             this.viewToolStripMenuItem.Text = "&View";
             // 
-            // mapInformationToolStripMenuItem
+            // objectSelectWindowMenuStrip
             // 
-            this.mapInformationToolStripMenuItem.Name = "mapInformationToolStripMenuItem";
-            this.mapInformationToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
-            this.mapInformationToolStripMenuItem.Text = "Map &Information...";
-            this.mapInformationToolStripMenuItem.Click += new System.EventHandler(this.mapInformationToolStripMenuItem_Click);
+            this.objectSelectWindowMenuStrip.CheckOnClick = true;
+            this.objectSelectWindowMenuStrip.Name = "objectSelectWindowMenuStrip";
+            this.objectSelectWindowMenuStrip.Size = new System.Drawing.Size(200, 22);
+            this.objectSelectWindowMenuStrip.Text = "Object &Select Window";
+            this.objectSelectWindowMenuStrip.CheckedChanged += new System.EventHandler(this.objectSelectWindowMenuStrip_CheckedChanged);
             // 
-            // toolStripSeparator4
+            // objectPlaceListWindowMenuItem
             // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(155, 6);
+            this.objectPlaceListWindowMenuItem.CheckOnClick = true;
+            this.objectPlaceListWindowMenuItem.Name = "objectPlaceListWindowMenuItem";
+            this.objectPlaceListWindowMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.objectPlaceListWindowMenuItem.Text = "Object Place List Window";
+            this.objectPlaceListWindowMenuItem.CheckedChanged += new System.EventHandler(this.objectPlaceListWindowMenuItem_CheckedChanged);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(197, 6);
             // 
             // objectsToolStripMenuItem
             // 
@@ -239,8 +250,16 @@
             this.objectsToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.objectsToolStripMenuItem.Enabled = false;
             this.objectsToolStripMenuItem.Name = "objectsToolStripMenuItem";
-            this.objectsToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.objectsToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.objectsToolStripMenuItem.Text = "&Objects";
+            // 
+            // collisionToolStripMenuItem
+            // 
+            this.collisionToolStripMenuItem.CheckOnClick = true;
+            this.collisionToolStripMenuItem.Enabled = false;
+            this.collisionToolStripMenuItem.Name = "collisionToolStripMenuItem";
+            this.collisionToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.collisionToolStripMenuItem.Text = "Block &Collision";
             // 
             // visualToolStripMenuItem
             // 
@@ -249,16 +268,20 @@
             this.visualToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.visualToolStripMenuItem.Enabled = false;
             this.visualToolStripMenuItem.Name = "visualToolStripMenuItem";
-            this.visualToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.visualToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.visualToolStripMenuItem.Text = "Block &Visual";
             // 
-            // collisionToolStripMenuItem
+            // toolStripSeparator4
             // 
-            this.collisionToolStripMenuItem.CheckOnClick = true;
-            this.collisionToolStripMenuItem.Enabled = false;
-            this.collisionToolStripMenuItem.Name = "collisionToolStripMenuItem";
-            this.collisionToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
-            this.collisionToolStripMenuItem.Text = "Block &Collision";
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(197, 6);
+            // 
+            // mapInformationToolStripMenuItem
+            // 
+            this.mapInformationToolStripMenuItem.Name = "mapInformationToolStripMenuItem";
+            this.mapInformationToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
+            this.mapInformationToolStripMenuItem.Text = "Map &Information...";
+            this.mapInformationToolStripMenuItem.Click += new System.EventHandler(this.mapInformationToolStripMenuItem_Click);
             // 
             // optionsToolStripMenuItem
             // 
@@ -308,19 +331,6 @@
             this.mainViewPanel.Name = "mainViewPanel";
             this.mainViewPanel.Size = new System.Drawing.Size(384, 286);
             this.mainViewPanel.TabIndex = 3;
-            // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(204, 6);
-            // 
-            // objectSelectWindowMenuStrip
-            // 
-            this.objectSelectWindowMenuStrip.CheckOnClick = true;
-            this.objectSelectWindowMenuStrip.Name = "objectSelectWindowMenuStrip";
-            this.objectSelectWindowMenuStrip.Size = new System.Drawing.Size(207, 22);
-            this.objectSelectWindowMenuStrip.Text = "Object &Select Window";
-            this.objectSelectWindowMenuStrip.CheckedChanged += new System.EventHandler(this.toolStripMenuItem1_CheckedChanged);
             // 
             // Form1
             // 
@@ -377,6 +387,7 @@
         private System.Windows.Forms.ToolStripMenuItem resolvePreparedListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem reloadObjectInfoFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem objectSelectWindowMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem objectPlaceListWindowMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
     }
 }

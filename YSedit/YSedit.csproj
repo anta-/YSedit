@@ -90,6 +90,12 @@
     <Compile Include="MainView.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="ObjectInfo.cs" />
+    <Compile Include="ObjectPlaceList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ObjectPlaceList.Designer.cs">
+      <DependentUpon>ObjectPlaceList.cs</DependentUpon>
+    </Compile>
     <Compile Include="ObjectSelector.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +123,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ObjectPlaceList.resx">
+      <DependentUpon>ObjectPlaceList.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ObjectSelector.resx">
       <DependentUpon>ObjectSelector.cs</DependentUpon>
