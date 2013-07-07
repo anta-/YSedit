@@ -63,6 +63,7 @@ namespace YSedit
         class ObjectBox : PictureBox
         {
             MainView mainView;
+
             public ObjectBox(MainView mainView)
                 : base()
             {
@@ -207,7 +208,6 @@ namespace YSedit
             b.Location = rect.Location;
             b.Size = rect.Size;
 
-            b.MouseHover += tooltipPopup;
             b.MouseDown += objMouseDown;
             b.MouseUp += objMouseUp;
             b.MouseMove += objMouseMove;
@@ -267,30 +267,6 @@ namespace YSedit
             //値が小さい方が前面に出る
             pictureBox.Controls.SetChildIndex(
                 objBoxes[i], objBoxes.Count - i);
-        }
-
-        void tooltipPopup(object sender, EventArgs e)
-        {
-            var t = new ToolTip();
-            var p = (ObjectBox)sender;
-            var i = objBoxes.IndexOf(p);
-            if (i == -1)
-                return;
-            var o = objList[i];
-            var namej = ObjectInfo.getObjectName(o.kind, ObjectInfo.Language.Japanese);
-            var namee = ObjectInfo.getObjectName(o.kind, ObjectInfo.Language.English);
-            var descj = ObjectInfo.getObjectDescription(o.kind, ObjectInfo.Language.Japanese);
-            var desce = ObjectInfo.getObjectDescription(o.kind, ObjectInfo.Language.English);
-            t.SetToolTip(p,
-                "#" + i.ToString("x2") + "\n" +
-                "Kind: " + o.kind.ToString("x4") + "\n" +
-                (namej == "" ? "" : "(ja): " + namej + "\n") +
-                (descj == "" ? "" : "      " + descj + "\n") +
-                (namee == "" ? "" : "(en): " + namee + "\n") +
-                (desce == "" ? "" : "      " + desce + "\n") +
-                "Info: " + o.info.ToString("x4") + "\n" +
-                "XPos: 0x" + o.x.floatToHexString() + " / " + o.x.ToString() + "\n" +
-                "YPos: 0x" + o.y.floatToHexString() + " / " + o.y.ToString());
         }
 
         /// <summary>
