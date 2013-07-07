@@ -146,7 +146,7 @@ namespace YSedit
                 }
             }
 
-            return f;
+            return (sign ? -1 : 1) * f;
         }
 
         public static float? tryFloatFromHexString(this string s)
