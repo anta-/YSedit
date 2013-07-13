@@ -120,7 +120,7 @@ namespace YSedit
                 rom.Dispose();
                 rom = null;
                 mainView.Dispose();
-                mainView = null;
+                objectPlaceList.mainView = mainView = null;
                 setInfoStatusText("ROM closed");
                 return false;
             }
@@ -150,7 +150,8 @@ namespace YSedit
                 rom = new ROM(path);
                 rom.changedChanged += romChangedChanged;
 
-                rom.mainView = mainView = new MainView(mainViewPanel, rom.romIF);
+                objectPlaceList.mainView = rom.mainView = mainView =
+                     new MainView(mainViewPanel, rom.romIF, objectPlaceList);
 
                 rom.openPracticeMap();
                 setInfoStatusText("ROM \"" + path + "\", practice map opened");

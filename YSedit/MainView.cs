@@ -21,6 +21,7 @@ namespace YSedit
         /// </summary>
         public event OnChangedProc onChanged;
 
+        ObjectPlaceList objectPlaceList;
         ROMInterface romIF;
 
         Panel panel;
@@ -39,7 +40,7 @@ namespace YSedit
             }
         }
 
-        class Obj {
+        public class Obj {
             public ushort kind, info;
             public float x, y;
 
@@ -48,6 +49,8 @@ namespace YSedit
             public Rectangle rect
             {
                 get {
+                    if (Math.Abs(x) > 0x10000000 || Math.Abs(y) > 0x10000000)
+                        return new Rectangle(0x10000000, 0x10000000, 0, 0);
                     return new Rectangle(new Point((int)x, (int)y), objectDrawBox);
                 }
             }
@@ -60,6 +63,7 @@ namespace YSedit
                 this.y = y;
             }
         };
+
         class ObjectBox : PictureBox
         {
             MainView mainView;
@@ -117,10 +121,11 @@ namespace YSedit
         Rectangle? selectionRect = null;
         int[] selectObjsAtSelectionStart;
 
-        public MainView(Panel panel, ROMInterface romIF)
+        public MainView(Panel panel, ROMInterface romIF, ObjectPlaceList objectPlaceList)
         {
             this.romIF = romIF;
             this.panel = panel;
+            this.objectPlaceList = objectPlaceList;
 
             pictureBox = new PictureBox();
             //子供の場所の描画をするために
@@ -157,6 +162,8 @@ namespace YSedit
         {
             panel.Controls.Clear();
             panel.Resize -= panel_Resize;
+            objectPlaceList.SetObjPlaceList(
+                new List<ObjectPlaceList.ObjPlace>());
         }
 
         /// <summary>
@@ -214,7 +221,6 @@ namespace YSedit
             b.MouseCaptureChanged += objMouseCaptureChanged;
             objBoxes.Add(b);
             pictureBox.Controls.Add(b);
-            setObjectChildIndex(i);
 
             dragStartObjPoses.Add(null);
 
@@ -230,6 +236,7 @@ namespace YSedit
             if (selectObjs.Contains(i))
                 selectObjs.Remove(i);
             changed();
+            objectsChanged();
         }
 
         /// <summary>
@@ -239,12 +246,7 @@ namespace YSedit
         public void setObjPlaces(Data objPlaces)
         {
             int number = (int)(objPlaces.bytes.Length / romIF.objPlaceC_size);
-            objList = new List<Obj>(number);
-            objBoxes = new List<ObjectBox>(number);
-            dragStartObjPoses = new List<Point?>(number);
-
-            pictureBox.SuspendDrawing();
-            pictureBox.Controls.Clear();
+            List<Obj> list = new List<Obj>();
             for (var i = 0; i < number; i++)
             {
                 uint o = (uint)(i * romIF.objPlaceC_size);
@@ -253,20 +255,39 @@ namespace YSedit
                     objPlaces.getHalf(o + romIF.objPlace_info),
                     objPlaces.getFloat(o + romIF.objPlace_xpos),
                     objPlaces.getFloat(o + romIF.objPlace_ypos));
-                addObj(p);
+                list.Add(p);
             }
+
+            setObjPlaces(list);
+        }
+        public void setObjPlaces(List<Obj> objs)
+        {
+            objList = new List<Obj>(objs.Count);
+            objBoxes = new List<ObjectBox>(objs.Count);
+            dragStartObjPoses = new List<Point?>(objs.Count);
+
+            pictureBox.SuspendDrawing();
+            pictureBox.Controls.Clear();
+
+            foreach (var p in objs)
+                addObj(p);
 
             selectObjs.Clear();
 
+            setObjectChildIndices();
+            objectsChanged();
+
             movingEnd();
             redraw();
+            objectPlaceList.SetSelectedIds(new List<int>());
         }
 
-        void setObjectChildIndex(int i)
+        void setObjectChildIndices()
         {
-            //値が小さい方が前面に出る
-            pictureBox.Controls.SetChildIndex(
-                objBoxes[i], objBoxes.Count - i);
+            for (var i = objBoxes.Count - 1; i >= 0; i-- )
+                //値が小さい方が前面に出る
+                pictureBox.Controls.SetChildIndex(
+                    objBoxes[i], objBoxes.Count - i);
         }
 
         /// <summary>
@@ -328,13 +349,14 @@ namespace YSedit
             else if (Control.ModifierKeys.HasFlag(Keys.Control))
             {
                 selectObjs.Add(i);
+                selectedIdsChanged();
             }
             else
             {
                 selectObjs.Clear();
                 selectObjs.Add(i);
+                selectedIdsChanged();
             }
-            infoObjSelected();
 
             p.Capture = true;
             dragStartControl = p;
@@ -349,7 +371,7 @@ namespace YSedit
             }
         }
 
-        void changed()
+        public void changed()
         {
             if (onChanged != null) onChanged();
         }
@@ -452,7 +474,8 @@ namespace YSedit
                 objBoxes[j].Visible = true;
             }
 
-            infoObjSelected();
+            objectsChanged();
+            selectedIdsChanged();
         }
 
         /// <summary>
@@ -514,9 +537,8 @@ namespace YSedit
                 dragStartObjPoses[i] = tmpDragStartObjPoses[perm[i]];
                 if (tmpSelectObjs.Contains(perm[i]))
                     selectObjs.Add(i);
-                if (perm[i] != i)
-                    setObjectChildIndex(i);
             }
+            setObjectChildIndices();
         }
 
         private void pictureBox_Paint(object sender, PaintEventArgs e)
@@ -638,7 +660,9 @@ namespace YSedit
             if (!Control.ModifierKeys.HasFlag(Keys.Control))
             {
                 selectObjs.Clear();
+                selectedIdsChanged();
             }
+
             selectObjsAtSelectionStart = new int[selectObjs.Count];
             selectObjs.CopyTo(selectObjsAtSelectionStart);
             selectionStartPoint = e.Location + currentScroll;
@@ -688,6 +712,9 @@ namespace YSedit
 
         void endSelecting()
         {
+            if (!rectSelecting)
+                return;
+
             rectSelecting = false;
             pictureBox.Capture = false;
             selectionStartPoint = null;
@@ -695,7 +722,7 @@ namespace YSedit
             selectionRect = null;
             movingEnd();
             redraw();
-            infoObjSelected();
+            selectedIdsChanged();
         }
 
         void infoObjSelected()
@@ -739,6 +766,9 @@ namespace YSedit
             foreach (var j in addedObjs)
                 selectObjs.Add(j);
 
+            objectsChanged();
+            selectedIdsChanged();
+
             if (selectObjs.Count() != 0)
             {
                 int k = selectObjs.First();
@@ -767,6 +797,78 @@ namespace YSedit
                 deleteObj(i);
             
             redraw();
+        }
+
+        void objectsChanged()
+        {
+            if (objectPlaceList == null)
+                return;
+
+            var list = new List<ObjectPlaceList.ObjPlace>();
+            foreach (var o in objList)
+            {
+                list.Add(new ObjectPlaceList.ObjPlace(
+                    o.kind, o.info, o.x, o.y));
+            }
+            objectPlaceList.SetObjPlaceList(list);
+        }
+
+        void selectedIdsChanged()
+        {
+            infoObjSelected();
+            if (objectPlaceList == null)
+                return;
+            objectPlaceList.SetSelectedIds(
+                selectObjs.ToList());
+        }
+
+        public void SetSelectedIds(List<int> ids)
+        {
+            if (objDrag) endDrag();
+            endSelecting();
+            selectObjs = new HashSet<int>(ids);
+            infoObjSelected();
+            tryScrollToSelected();
+            redraw();
+        }
+
+        public void tryScrollToSelected()
+        {
+            if (selectObjs.Count == 0)
+                return;
+
+            Rectangle rect = new Rectangle();
+            bool first = true;
+            foreach (var i in selectObjs)
+            {
+                var o = objList[i];
+                if (first)
+                {
+                    rect = o.rect;
+                    first = false;
+                }
+                else
+                    rect = Rectangle.Union(rect, o.rect);
+            }
+
+            if (!(rect.Width <= pictureBox.Width &&
+                rect.Height <= pictureBox.Height))
+                return;
+
+            var scrollRect = rect;
+            scrollRect.X -= currentScroll.Width;
+            scrollRect.Y -= currentScroll.Height;
+            if (pictureBox.ClientRectangle.Contains(scrollRect))
+                return;
+
+            int x = rect.X + rect.Width / 2 - pictureBox.Width / 2,
+                y = rect.Y + rect.Height / 2 - pictureBox.Height / 2;
+            x = Math.Min(Math.Max(x, 0), hScrollBar.Maximum);
+            y = Math.Min(Math.Max(y, 0), vScrollBar.Maximum);
+
+            hScrollBar.Value = x;
+            vScrollBar.Value = y;
+            movingEnd();
         }
     }
 }

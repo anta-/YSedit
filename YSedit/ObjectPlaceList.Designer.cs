@@ -47,8 +47,10 @@
             this.listBox1.ItemHeight = 12;
             this.listBox1.Location = new System.Drawing.Point(12, 62);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(224, 280);
+            this.listBox1.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
+            this.listBox1.Size = new System.Drawing.Size(290, 280);
             this.listBox1.TabIndex = 100;
+            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.listBox1_SelectedIndexChanged);
             // 
             // textBoxID
             // 
@@ -57,6 +59,8 @@
             this.textBoxID.Name = "textBoxID";
             this.textBoxID.Size = new System.Drawing.Size(19, 19);
             this.textBoxID.TabIndex = 1;
+            this.textBoxID.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_KeyDown);
+            this.textBoxID.Leave += new System.EventHandler(this.textBox_Leave);
             // 
             // label1
             // 
@@ -75,6 +79,8 @@
             this.textBoxKind.Name = "textBoxKind";
             this.textBoxKind.Size = new System.Drawing.Size(31, 19);
             this.textBoxKind.TabIndex = 2;
+            this.textBoxKind.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_KeyDown);
+            this.textBoxKind.Leave += new System.EventHandler(this.textBox_Leave);
             // 
             // label2
             // 
@@ -93,6 +99,8 @@
             this.textBoxInfo.Name = "textBoxInfo";
             this.textBoxInfo.Size = new System.Drawing.Size(31, 19);
             this.textBoxInfo.TabIndex = 3;
+            this.textBoxInfo.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_KeyDown);
+            this.textBoxInfo.Leave += new System.EventHandler(this.textBox_Leave);
             // 
             // label3
             // 
@@ -111,6 +119,8 @@
             this.textBoxPosX.Name = "textBoxPosX";
             this.textBoxPosX.Size = new System.Drawing.Size(74, 19);
             this.textBoxPosX.TabIndex = 4;
+            this.textBoxPosX.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_KeyDown);
+            this.textBoxPosX.Leave += new System.EventHandler(this.textBox_Leave);
             // 
             // label4
             // 
@@ -129,6 +139,8 @@
             this.textBoxPosY.Name = "textBoxPosY";
             this.textBoxPosY.Size = new System.Drawing.Size(74, 19);
             this.textBoxPosY.TabIndex = 5;
+            this.textBoxPosY.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBox_KeyDown);
+            this.textBoxPosY.Leave += new System.EventHandler(this.textBox_Leave);
             // 
             // label5
             // 
@@ -144,7 +156,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(248, 353);
+            this.ClientSize = new System.Drawing.Size(314, 353);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);

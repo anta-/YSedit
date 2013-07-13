@@ -23,6 +23,18 @@ namespace YSedit
             return x;
         }
 
+        public static uint? tryParseHex(this string s, uint maxNumber = 0xffffffff)
+        {
+            try
+            {
+                return s.parseHex(maxNumber);
+            }
+            catch (FormatException)
+            {
+                return null;
+            }
+        }
+
         public static string formatSigned(this int x, string format = "x")
         {
             if (x < 0)

@@ -319,6 +319,10 @@ namespace YSedit
                 return "";
             return infos[kind].names[(int)lang];
         }
+        public static string getObjectName(uint kind)
+        {
+            return getObjectName(kind, Language.Japanese);
+        }
 
         public static string getObjectDescription(uint kind, Language lang)
         {
