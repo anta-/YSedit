@@ -686,7 +686,7 @@ namespace YSedit
             for (var i = 0; i < objList.Count; i++)
             {
                 var p = objList[i];
-                if (selectionRect.Value.Contains(objList[i].rect))
+                if (selectionRect.Value.IntersectsWith(objList[i].rect))
                 {
                     if (selectObjs.Contains(i))
                         selectObjs.Remove(i);
