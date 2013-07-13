@@ -18,11 +18,28 @@ namespace YSedit
         [STAThread]
         static void Main()
         {
-            ObjectInfo.init();
+            loadResourceFiles();
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             form = new Form1();
             Application.Run(form);
+        }
+
+        public static void loadResourceFiles()
+        {
+            try
+            {
+                ObjectInfo.init();
+                MapName.init();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(
+                    "The exception raised in loading resource files:\n" + e.ToString(),
+                    "",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         public static void showInfo(string s)
@@ -34,6 +51,11 @@ namespace YSedit
         {
             form.setInfoStatusText("Error: " + s);
             System.Media.SystemSounds.Exclamation.Play();
+        }
+
+        public static string getResourceDirectory()
+        {
+            return System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
         }
     }
 }

@@ -91,33 +91,23 @@ namespace YSedit
             loadObjectGroups();
         }
 
-        static string[] getLines(string path)
-        {
-            using (var f = new StreamReader(path)) {
-                return f
-                    .ReadToEnd()
-                    .Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                    .Where(x => x[0] != '#').ToArray();
-            }
-        }
-
         static void loadAllObjects()
         {
-            var a = getLines(directory + "AllObjects.txt");
+            var a = Util.getLinesFromFile(directory + "AllObjects.txt");
             foreach (var x in a)
                 infos[x.parseHex(0xffff)] = new Info();
         }
 
         static void loadCanPlace()
         {
-            var a = getLines(directory + "CanPlaceObjects.txt");
+            var a = Util.getLinesFromFile(directory + "CanPlaceObjects.txt");
             foreach (var x in a)
                 infos[x.parseHex(0xffff)].canPlace = true;
         }
 
         static void loadObjectName(Language lang, string suf)
         {
-            var a = getLines(directory + "ObjectName_" + suf + ".txt");
+            var a = Util.getLinesFromFile(directory + "ObjectName_" + suf + ".txt");
             foreach (var line in a)
             {
                 var t = line.Split('\t');
@@ -145,7 +135,7 @@ namespace YSedit
 
         static void loadObjectDependents()
         {
-            var a = getLines(directory + "ObjectDependents.txt");
+            var a = Util.getLinesFromFile(directory + "ObjectDependents.txt");
             foreach (var line in a)
             {
                 if (line.Trim() == "") continue;
@@ -166,7 +156,7 @@ namespace YSedit
 
         static void loadObjectFuncs()
         {
-            var a = getLines(directory + "ObjectFuncs.txt");
+            var a = Util.getLinesFromFile(directory + "ObjectFuncs.txt");
             foreach (var line in a)
             {
                 var t = line.Split('\t');
@@ -267,7 +257,7 @@ namespace YSedit
 
         static void loadObjectGroups()
         {
-            var a = getLines(directory + "ObjectGroups.txt");
+            var a = Util.getLinesFromFile(directory + "ObjectGroups.txt");
             objectGroups = new List<ObjectGroup>();
 
             string currentGroupName = null;

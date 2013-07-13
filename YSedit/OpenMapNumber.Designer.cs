@@ -36,17 +36,18 @@
             // 
             // mapName
             // 
-            this.mapName.Enabled = false;
+            this.mapName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.mapName.FormattingEnabled = true;
-            this.mapName.Location = new System.Drawing.Point(76, 12);
+            this.mapName.Location = new System.Drawing.Point(37, 12);
             this.mapName.Name = "mapName";
-            this.mapName.Size = new System.Drawing.Size(96, 20);
+            this.mapName.Size = new System.Drawing.Size(225, 20);
             this.mapName.TabIndex = 1;
+            this.mapName.SelectionChangeCommitted += new System.EventHandler(this.mapName_SelectionChangeCommitted);
             // 
             // Cancel
             // 
             this.Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.Cancel.Location = new System.Drawing.Point(95, 38);
+            this.Cancel.Location = new System.Drawing.Point(185, 38);
             this.Cancel.Name = "Cancel";
             this.Cancel.Size = new System.Drawing.Size(77, 27);
             this.Cancel.TabIndex = 3;
@@ -56,7 +57,7 @@
             // 
             // OK
             // 
-            this.OK.Location = new System.Drawing.Point(12, 38);
+            this.OK.Location = new System.Drawing.Point(102, 38);
             this.OK.Name = "OK";
             this.OK.Size = new System.Drawing.Size(77, 27);
             this.OK.TabIndex = 2;
@@ -68,8 +69,9 @@
             // 
             this.mapNumber.Location = new System.Drawing.Point(12, 13);
             this.mapNumber.Name = "mapNumber";
-            this.mapNumber.Size = new System.Drawing.Size(58, 19);
+            this.mapNumber.Size = new System.Drawing.Size(19, 19);
             this.mapNumber.TabIndex = 0;
+            this.mapNumber.TextChanged += new System.EventHandler(this.mapNumber_TextChanged);
             // 
             // OpenMapNumber
             // 
@@ -77,7 +79,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.Cancel;
-            this.ClientSize = new System.Drawing.Size(183, 74);
+            this.ClientSize = new System.Drawing.Size(274, 74);
             this.Controls.Add(this.mapNumber);
             this.Controls.Add(this.OK);
             this.Controls.Add(this.Cancel);

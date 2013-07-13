@@ -34,7 +34,7 @@
             this.closeROMToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openMapNumberToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveMapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reloadObjectInfoFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.reloadResourceFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mapEditToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editObjectModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -84,7 +84,7 @@
             this.closeROMToolStripMenuItem,
             this.openMapNumberToolStripMenuItem,
             this.saveMapToolStripMenuItem,
-            this.reloadObjectInfoFileToolStripMenuItem});
+            this.reloadResourceFileToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(36, 20);
             this.fileToolStripMenuItem.Text = "&File";
@@ -92,21 +92,21 @@
             // openROMToolStripMenuItem
             // 
             this.openROMToolStripMenuItem.Name = "openROMToolStripMenuItem";
-            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.openROMToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.openROMToolStripMenuItem.Text = "&Open ROM...";
             this.openROMToolStripMenuItem.Click += new System.EventHandler(this.openROMToolStripMenuItem_Click);
             // 
             // closeROMToolStripMenuItem
             // 
             this.closeROMToolStripMenuItem.Name = "closeROMToolStripMenuItem";
-            this.closeROMToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.closeROMToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.closeROMToolStripMenuItem.Text = "&Close ROM";
             this.closeROMToolStripMenuItem.Click += new System.EventHandler(this.closeROMToolStripMenuItem_Click);
             // 
             // openMapNumberToolStripMenuItem
             // 
             this.openMapNumberToolStripMenuItem.Name = "openMapNumberToolStripMenuItem";
-            this.openMapNumberToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.openMapNumberToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.openMapNumberToolStripMenuItem.Text = "Open &Map Number...";
             this.openMapNumberToolStripMenuItem.Click += new System.EventHandler(this.openMapNumberToolStripMenuItem_Click);
             // 
@@ -114,16 +114,16 @@
             // 
             this.saveMapToolStripMenuItem.Enabled = false;
             this.saveMapToolStripMenuItem.Name = "saveMapToolStripMenuItem";
-            this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.saveMapToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
             this.saveMapToolStripMenuItem.Text = "&Save Map to ROM";
             this.saveMapToolStripMenuItem.Click += new System.EventHandler(this.saveMapToolStripMenuItem_Click);
             // 
-            // reloadObjectInfoFileToolStripMenuItem
+            // reloadResourceFileToolStripMenuItem
             // 
-            this.reloadObjectInfoFileToolStripMenuItem.Name = "reloadObjectInfoFileToolStripMenuItem";
-            this.reloadObjectInfoFileToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.reloadObjectInfoFileToolStripMenuItem.Text = "&Reload ObjectInfo Files";
-            this.reloadObjectInfoFileToolStripMenuItem.Click += new System.EventHandler(this.reloadObjectInfoFileToolStripMenuItem_Click);
+            this.reloadResourceFileToolStripMenuItem.Name = "reloadResourceFileToolStripMenuItem";
+            this.reloadResourceFileToolStripMenuItem.Size = new System.Drawing.Size(186, 22);
+            this.reloadResourceFileToolStripMenuItem.Text = "&Reload Resource Files";
+            this.reloadResourceFileToolStripMenuItem.Click += new System.EventHandler(this.reloadResourceFileToolStripMenuItem_Click);
             // 
             // mapEditToolStripMenuItem
             // 
@@ -375,7 +375,7 @@
         private System.Windows.Forms.ToolStripMenuItem editPreparedListToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem resolvePreparedListToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem reloadObjectInfoFileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem reloadResourceFileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem objectSelectWindowMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem objectPlaceListWindowMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;

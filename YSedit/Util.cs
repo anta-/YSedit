@@ -188,6 +188,24 @@ namespace YSedit
             return res;
         }
 
+
+        /// <summary>
+        /// リソースファイルから行を全て読み込んで返す。空行とコメント行は無視される。
+        /// </summary>
+        /// <param name="path">リソースファイルの相対パス</param>
+        /// <returns></returns>
+        public static string[] getLinesFromFile(string path)
+        {
+            string full = System.IO.Path.Combine(
+                Program.getResourceDirectory(), path);
+            using (var f = new System.IO.StreamReader(full))
+            {
+                return f
+                    .ReadToEnd()
+                    .Split(new string[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(x => x[0] != '#').ToArray();
+            }
+        }
     }
 
     //Vector(System.Windowsネームスペース)にしてやるのめんどくさい
