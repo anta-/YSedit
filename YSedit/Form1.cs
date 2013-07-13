@@ -151,7 +151,8 @@ namespace YSedit
                 rom.changedChanged += romChangedChanged;
 
                 objectPlaceList.mainView = rom.mainView = mainView =
-                     new MainView(mainViewPanel, rom.romIF, objectPlaceList);
+                     new MainView(mainViewPanel, rom.romIF,
+                         objectPlaceList, objectSelector);
 
                 rom.openPracticeMap();
                 setInfoStatusText("ROM \"" + path + "\", practice map opened");

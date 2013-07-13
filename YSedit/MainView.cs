@@ -22,6 +22,7 @@ namespace YSedit
         public event OnChangedProc onChanged;
 
         ObjectPlaceList objectPlaceList;
+        ObjectSelector objectSelector;
         ROMInterface romIF;
 
         Panel panel;
@@ -121,11 +122,12 @@ namespace YSedit
         Rectangle? selectionRect = null;
         int[] selectObjsAtSelectionStart;
 
-        public MainView(Panel panel, ROMInterface romIF, ObjectPlaceList objectPlaceList)
+        public MainView(Panel panel, ROMInterface romIF, ObjectPlaceList objectPlaceList, ObjectSelector objectSelector)
         {
             this.romIF = romIF;
             this.panel = panel;
             this.objectPlaceList = objectPlaceList;
+            this.objectSelector = objectSelector;
 
             pictureBox = new PictureBox();
             //子供の場所の描画をするために
@@ -820,6 +822,7 @@ namespace YSedit
                 return;
             objectPlaceList.SetSelectedIds(
                 selectObjs.ToList());
+            selectObjectInObjectSelector();
         }
 
         public void SetSelectedIds(List<int> ids)
@@ -829,6 +832,7 @@ namespace YSedit
             selectObjs = new HashSet<int>(ids);
             infoObjSelected();
             tryScrollToSelected();
+            selectObjectInObjectSelector();
             redraw();
         }
 
@@ -869,6 +873,15 @@ namespace YSedit
             hScrollBar.Value = x;
             vScrollBar.Value = y;
             movingEnd();
+        }
+
+        public void selectObjectInObjectSelector()
+        {
+            if (selectObjs.Count == 0)
+                return;
+            var kind = objList[selectObjs.First()].kind;
+            if (selectObjs.Select(i => objList[i].kind).All(k => k == kind))
+                objectSelector.selectObject(kind);
         }
     }
 }

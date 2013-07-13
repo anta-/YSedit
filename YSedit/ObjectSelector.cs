@@ -79,5 +79,28 @@ namespace YSedit
                 objectSelect.Width = p.ClientSize.Width;
             objectSelect.Height = p.ClientSize.Height - objectSelect.Top;
         }
+
+        public void selectObject(ushort kind)
+        {
+            foreach (var t in objectGroups.Zip(
+                Enumerable.Range(0, objectGroups.Count),
+                (x, y) => new Tuple<ObjectItem[], int>(x, y))
+                .OrderBy(t =>
+                    new Tuple<bool, int>(
+                        t.Item2 != objectGroupSelect.SelectedIndex,
+                        t.Item2)))
+            {
+                var g = t.Item1;
+                for (var i = 0; i < g.Length; i++)
+                {
+                    if (g[i].Kind == kind)
+                    {
+                        objectGroupSelect.SelectedIndex = t.Item2;
+                        objectSelect.SelectedIndex = i;
+                        return;
+                    }
+                }
+            }
+        }
     }
 }
