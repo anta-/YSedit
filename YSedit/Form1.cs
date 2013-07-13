@@ -56,11 +56,6 @@ namespace YSedit
             saveMapToolStripMenuItem.Enabled = false;
         }
 
-        private void editObjectListToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            rom.map.editObjectList();
-        }
-
         private void openMapNumberToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var dialog = new OpenMapNumber(rom.map.currentMapNumber);

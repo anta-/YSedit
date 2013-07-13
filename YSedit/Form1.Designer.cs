@@ -41,7 +41,6 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.editUStruct3ManualyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.editObjectListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editPreparedListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.change8xxxObjectToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -134,7 +133,6 @@
             this.toolStripSeparator1,
             this.editUStruct3ManualyToolStripMenuItem,
             this.toolStripSeparator2,
-            this.editObjectListToolStripMenuItem,
             this.editPreparedListToolStripMenuItem,
             this.toolStripSeparator3,
             this.change8xxxObjectToolStripMenuItem,
@@ -173,13 +171,6 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(204, 6);
-            // 
-            // editObjectListToolStripMenuItem
-            // 
-            this.editObjectListToolStripMenuItem.Name = "editObjectListToolStripMenuItem";
-            this.editObjectListToolStripMenuItem.Size = new System.Drawing.Size(207, 22);
-            this.editObjectListToolStripMenuItem.Text = "Edit Object &List...";
-            this.editObjectListToolStripMenuItem.Click += new System.EventHandler(this.editObjectListToolStripMenuItem_Click);
             // 
             // editPreparedListToolStripMenuItem
             // 
@@ -376,7 +367,6 @@
         private System.Windows.Forms.ToolStripMenuItem collisionToolStripMenuItem;
         private System.Windows.Forms.OpenFileDialog openROMFileDialog;
         private System.Windows.Forms.ToolStripMenuItem closeROMToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem editObjectListToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;
         public System.Windows.Forms.ToolStripStatusLabel infoStatusText;
         private System.Windows.Forms.ToolStripMenuItem mapInformationToolStripMenuItem;

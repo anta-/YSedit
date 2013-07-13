@@ -94,17 +94,6 @@ namespace YSedit
 
         }
 
-        public void editObjectList()
-        {
-            var oldObjPlaces = mainView.getObjPlaces();
-            var form = new EditObjectList(romIF, oldObjPlaces);
-            if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                rom.newChange(!oldObjPlaces.bytes.SequenceEqual(form.objPlaces.bytes));
-                mainView.setObjPlaces(form.objPlaces);
-            }
-        }
-
         public void editPreparedList()
         {
             var form = newEditPreparedList();
